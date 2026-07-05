@@ -223,6 +223,57 @@ export default function Home() {
     }
   };
 
+  // Helper to capture a card element to a PNG blob with pre-flight check and fallback
+  const captureCardToBlob = async (cardElement: HTMLElement): Promise<Blob> => {
+    const originalAvatar = cardAvatarUrl;
+    try {
+      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
+        try {
+          await preloadImage(cardAvatarUrl);
+        } catch (e) {
+          console.warn('[Canvas] Preload image failed:', e);
+        }
+      }
+
+      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
+      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      const canvas = await html2canvas(cardElement, {
+        scale: 2,
+        backgroundColor: '#000000',
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+      });
+
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('Blob generation returned null');
+      return blob;
+    } catch (err) {
+      console.warn('[Canvas] Standard capture failed, attempting fallback:', err);
+      setCardAvatarUrl('/black-bull-logo.jpg');
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const canvas = await html2canvas(cardElement, {
+        scale: 2,
+        backgroundColor: '#000000',
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+      });
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('Fallback blob generation returned null');
+      return blob;
+    } finally {
+      setCardAvatarUrl(originalAvatar);
+    }
+  };
+
   const downloadShareCard = async () => {
     const cardElement = document.getElementById('allocation-card') as HTMLElement | null;
     if (!cardElement) return;
@@ -294,60 +345,24 @@ export default function Home() {
 
     setCopyingCard(true);
     cardElement.style.opacity = '1'; // Reveal for capture
+
+    // Construct the Promise<Blob> and immediately pass to write to satisfy browser activation timing constraints
+    const blobPromise = captureCardToBlob(cardElement);
+
     try {
-      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
-        await preloadImage(cardAvatarUrl);
-      }
-
-      // Pre-flight avatar check
-      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
-      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
-      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
-        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const canvas = await html2canvas(cardElement, {
-        scale: 2,
-        backgroundColor: '#000000',
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      });
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) { alert('Failed to generate image blob, calf!'); setCopyingCard(false); return; }
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          alert('📋 Card image copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
-        } catch (clipErr: any) {
-          console.error('[Clipboard] Failed to write image:', clipErr);
-          alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
-          downloadShareCard();
-        } finally { setCopyingCard(false); }
-      }, 'image/png');
-    } catch (err: any) {
-      console.error('[Canvas] Standard PNG copy failed, attempting fallback:', err);
-      try {
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
-        canvas.toBlob(async (blob) => {
-          if (!blob) { alert('Failed to generate fallback image blob, calf!'); setCopyingCard(false); return; }
-          try {
-            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            alert('📋 Card image (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
-          } catch (clipErr: any) { downloadShareCard(); }
-          finally { setCopyingCard(false); }
-        }, 'image/png');
-      } catch (fallbackErr: any) {
-        console.error('[Canvas] Fallback PNG copy failed:', fallbackErr);
-        alert('Failed to copy card, calf!');
-        setCopyingCard(false);
-      } finally { setCardAvatarUrl(avatarUrl); }
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blobPromise,
+        }),
+      ]);
+      alert('📋 Card image copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
+    } catch (clipErr: any) {
+      console.error('[Clipboard] Failed to write image:', clipErr);
+      alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
+      downloadShareCard();
     } finally {
       cardElement.style.opacity = ''; // Restore hidden state
+      setCopyingCard(false);
     }
   };
 
@@ -433,60 +448,24 @@ export default function Home() {
 
     setCopyingCard(true);
     cardElement.style.opacity = '1'; // Reveal for capture
+
+    // Construct the Promise<Blob> and immediately pass to write to satisfy browser activation timing constraints
+    const blobPromise = captureCardToBlob(cardElement);
+
     try {
-      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
-        await preloadImage(cardAvatarUrl);
-      }
-
-      // Pre-flight avatar check
-      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
-      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
-      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
-        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const canvas = await html2canvas(cardElement, {
-        scale: 2,
-        backgroundColor: '#000000',
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      });
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) { alert('Failed to generate image blob, calf!'); setCopyingCard(false); return; }
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          alert('📋 Simulation card copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
-        } catch (clipErr: any) {
-          console.error('[Clipboard] Failed to write image:', clipErr);
-          alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
-          downloadSimCard();
-        } finally { setCopyingCard(false); }
-      }, 'image/png');
-    } catch (err: any) {
-      console.error('[Canvas] Standard Simulator PNG copy failed, attempting fallback:', err);
-      try {
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
-        canvas.toBlob(async (blob) => {
-          if (!blob) { alert('Failed to generate fallback image blob, calf!'); setCopyingCard(false); return; }
-          try {
-            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            alert('📋 Simulation card (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
-          } catch (clipErr: any) { downloadSimCard(); }
-          finally { setCopyingCard(false); }
-        }, 'image/png');
-      } catch (fallbackErr: any) {
-        console.error('[Canvas] Fallback Simulator PNG copy failed:', fallbackErr);
-        alert('Failed to copy card, calf!');
-        setCopyingCard(false);
-      } finally { setCardAvatarUrl(avatarUrl); }
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blobPromise,
+        }),
+      ]);
+      alert('📋 Simulation card copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
+    } catch (clipErr: any) {
+      console.error('[Clipboard] Failed to write image:', clipErr);
+      alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
+      downloadSimCard();
     } finally {
       cardElement.style.opacity = ''; // Restore hidden state
+      setCopyingCard(false);
     }
   };
 
@@ -609,7 +588,7 @@ export default function Home() {
               </div>
               <div>
                 <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-                <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SOLANA ORACLE</span>
+                <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">ANSEM ORACLE</span>
               </div>
             </div>
             <div className="text-right">
@@ -636,15 +615,15 @@ export default function Home() {
               <span className="text-[9px] text-[#9ca3af] block font-bold uppercase tracking-widest">
                 $ANSEM tokens
               </span>
+              <span className="text-lg font-black text-brand-gold font-mono block mt-0.5">
+                ${(balanceData.allocationAmount * 0.3).toLocaleString(undefined, { maximumFractionDigits: 0 })} USD
+              </span>
             </div>
           </div>
 
           <div className="flex justify-between items-end border-t border-[rgba(255,255,255,0.1)] pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
             <div className="flex flex-col gap-0.5">
               <span>User: {balanceData.xHandle ? `@${balanceData.xHandle}` : 'Anon Calf'}</span>
-              <span className="text-[8px] text-[#4b5563] font-mono">
-                Wallet: {balanceData.wallet.slice(0, 8)}...{balanceData.wallet.slice(-8)}
-              </span>
             </div>
             <div className="text-right flex flex-col gap-0.5">
               <span className="text-brand-green">Built by @kellycryptos</span>
