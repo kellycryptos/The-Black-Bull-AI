@@ -281,57 +281,16 @@ export default function Home() {
     setGeneratingCard(true);
     cardElement.style.opacity = '1'; // Reveal for capture — html2canvas respects CSS opacity
     try {
-      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
-        await preloadImage(cardAvatarUrl);
-      }
-
-      // Pre-flight avatar check — swap to local logo if image didn't actually load
-      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
-      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
-      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
-        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const canvas = await html2canvas(cardElement, {
-        scale: 2,
-        backgroundColor: '#000000',
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL('image/png');
+      const blob = await captureCardToBlob(cardElement);
+      const imgData = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');
       downloadLink.download = `black-bull-allocation-${xInput.trim() || 'anon'}.png`;
       downloadLink.href = imgData;
       downloadLink.click();
+      URL.revokeObjectURL(imgData);
     } catch (err: any) {
-      console.error('[Canvas] Standard PNG download failed, attempting fallback without X avatar:', err);
-      try {
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 150));
-
-        const canvas = await html2canvas(cardElement, {
-          scale: 2,
-          backgroundColor: '#000000',
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const downloadLink = document.createElement('a');
-        downloadLink.download = `black-bull-allocation-${xInput.trim() || 'anon'}.png`;
-        downloadLink.href = imgData;
-        downloadLink.click();
-      } catch (fallbackErr: any) {
-        console.error('[Canvas] Fallback PNG download failed:', fallbackErr);
-        alert('Failed to generate PNG image card, calf!');
-      } finally {
-        setCardAvatarUrl(avatarUrl);
-      }
+      console.error('[Canvas] PNG download failed:', err);
+      alert('Failed to generate PNG image card, calf!');
     } finally {
       cardElement.style.opacity = ''; // Restore hidden state
       setGeneratingCard(false);
@@ -394,47 +353,16 @@ export default function Home() {
     setGeneratingCard(true);
     cardElement.style.opacity = '1'; // Reveal for capture
     try {
-      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
-        await preloadImage(cardAvatarUrl);
-      }
-
-      // Pre-flight avatar check
-      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
-      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
-      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
-        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const canvas = await html2canvas(cardElement, {
-        scale: 2,
-        backgroundColor: '#000000',
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL('image/png');
+      const blob = await captureCardToBlob(cardElement);
+      const imgData = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');
       downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
       downloadLink.href = imgData;
       downloadLink.click();
+      URL.revokeObjectURL(imgData);
     } catch (err: any) {
-      console.error('[Canvas] Standard Simulator PNG download failed, attempting fallback:', err);
-      try {
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
-        const imgData = canvas.toDataURL('image/png');
-        const downloadLink = document.createElement('a');
-        downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
-        downloadLink.href = imgData;
-        downloadLink.click();
-      } catch (fallbackErr: any) {
-        console.error('[Canvas] Fallback Simulator PNG download failed:', fallbackErr);
-        alert('Failed to generate PNG image card, calf!');
-      } finally { setCardAvatarUrl(avatarUrl); }
+      console.error('[Canvas] Simulator PNG download failed:', err);
+      alert('Failed to generate PNG image card, calf!');
     } finally {
       cardElement.style.opacity = ''; // Restore hidden state
       setGeneratingCard(false);
@@ -587,7 +515,7 @@ export default function Home() {
 
           <div className="flex-1 flex flex-col justify-center gap-2.5 py-3 text-center relative z-20">
             {/* Centered User Avatar */}
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-brand-green/20">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
               <img
                 src={cardAvatarUrl}
                 className="w-full h-full object-cover"
@@ -659,7 +587,7 @@ export default function Home() {
 
         <div className="flex-1 flex flex-col justify-center gap-2 py-3 text-center relative z-20">
           {/* Centered User Avatar */}
-          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-brand-green/20">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
             <img
               src={cardAvatarUrl}
               className="w-full h-full object-cover"
