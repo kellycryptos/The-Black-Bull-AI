@@ -605,6 +605,7 @@ export default function Home() {
       
       {/* ---------------- OFF-SCREEN IMAGE GENERATION CANVASES ---------------- */}
       {/* Scanner Card Canvas */}
+      {/* WARNING: only use brand-* theme colors or hex arbitrary values (text-[#...]) in this element — default Tailwind palette classes compile to oklch() and will break html2canvas image export. */}
       {balanceData && (
         <div
           id="allocation-card"
@@ -636,12 +637,12 @@ export default function Home() {
             </div>
             <div className="text-right">
               <span className="text-xs font-black text-brand-gold">$ANSEM</span>
-              <p className="text-[7px] text-gray-500 font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
+              <p className="text-[7px] text-[#6b7280] font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col justify-center gap-3 py-4 text-center relative z-20">
-            <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
+            <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest">
               Trench Classification
             </div>
             <div className="text-2xl font-black text-white uppercase tracking-wider glow-text-green leading-none">
@@ -649,34 +650,35 @@ export default function Home() {
             </div>
 
             <div className="bg-black/60 border border-white/10 py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
-              <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
+              <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
               <span className="text-2xl font-black text-brand-green font-mono block my-0.5">
                 {balanceData.allocationAmount.toLocaleString()}
               </span>
-              <span className="text-[9px] text-gray-400 block font-bold uppercase tracking-widest">
+              <span className="text-[9px] text-[#9ca3af] block font-bold uppercase tracking-widest">
                 $ANSEM tokens
               </span>
             </div>
           </div>
 
-          <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-gray-500 font-bold relative z-20">
+          <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
             <div className="flex flex-col gap-0.5">
               <span>User: {balanceData.xHandle ? `@${balanceData.xHandle}` : 'Anon Calf'}</span>
-              <span className="text-[8px] text-gray-600 font-mono">
+              <span className="text-[8px] text-[#4b5563] font-mono">
                 Wallet: {balanceData.wallet.slice(0, 8)}...{balanceData.wallet.slice(-8)}
               </span>
             </div>
             <div className="text-right flex flex-col gap-0.5">
               <span className="text-brand-green">Built by @kellycryptos</span>
-              <span className="text-[8px] text-gray-600 font-mono">the-black-bull-ai.vercel.app</span>
+              <span className="text-[8px] text-[#4b5563] font-mono">the-black-bull-ai.vercel.app</span>
             </div>
           </div>
         </div>
       )}
 
       {/* Simulator Card Canvas */}
+      {/* WARNING: only use brand-* theme colors or hex arbitrary values (text-[#...]) in this element — default Tailwind palette classes compile to oklch() and will break html2canvas image export. */}
       <div
         id="simulator-card"
         className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
@@ -707,12 +709,12 @@ export default function Home() {
           </div>
           <div className="text-right">
             <span className="text-xs font-black text-brand-gold">$ANSEM</span>
-            <p className="text-[7px] text-gray-500 font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
+            <p className="text-[7px] text-[#6b7280] font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center gap-2 py-4 text-center relative z-20">
-          <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
+          <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest">
             Speculative Bull Allocation
           </div>
           <div className="text-xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
@@ -720,7 +722,7 @@ export default function Home() {
           </div>
 
           <div className="bg-black/60 border border-white/10 py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[260px]">
-            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
+            <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
               Projected Valuation (at {formatMarketCap(selectedMarketCap)} MC)
             </span>
             <span className="text-2xl font-black text-brand-gold font-mono block my-0.5">
@@ -729,16 +731,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-gray-500 font-bold relative z-20">
+        <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
           <div className="flex flex-col gap-0.5">
             <span>User: {xInput.trim() ? `@${xInput.trim().replace(/^@/, '')}` : 'Anon Calf'}</span>
-            <span className="text-[8px] text-gray-600 font-mono">
+            <span className="text-[8px] text-[#4b5563] font-mono">
               Holdings: {simHoldings.toLocaleString()} $ANSEM | Impressions: {simImpressions.toLocaleString()}
             </span>
           </div>
           <div className="text-right flex flex-col gap-0.5">
             <span className="text-brand-green">Built by @kellycryptos</span>
-            <span className="text-[8px] text-gray-600 font-mono">the-black-bull-ai.vercel.app</span>
+            <span className="text-[8px] text-[#4b5563] font-mono">the-black-bull-ai.vercel.app</span>
           </div>
         </div>
       </div>
