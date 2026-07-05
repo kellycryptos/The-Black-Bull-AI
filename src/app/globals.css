@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-black: #000000;
+  --color-brand-dark: #050505;
+  --color-brand-slate: #0c0d0e;
+  --color-brand-card: #121315;
+  --color-brand-gold: #fbbf24;
+  --color-brand-gold-dark: #d97706;
+  --color-brand-gold-glow: rgba(251, 191, 36, 0.15);
+  --color-brand-red: #ef4444;
+  --color-brand-red-glow: rgba(239, 68, 68, 0.2);
+
+  --animate-shake: shake 0.3s ease-in-out;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+}
+
+:root {
+  --background: #000000;
+  --foreground: #f3f4f6;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for Chat Box */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+/* Custom Glassmorphism Panels */
+.glass-panel {
+  background: rgba(18, 19, 21, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.gold-glow-border {
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.08);
+}
+
+.red-glow-border {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.08);
+}
+
+.glow-text-gold {
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.45);
+}
+
+.glow-text-red {
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+}
+
+.glow-text-white {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Trench grid pattern */
+.trench-grid {
+  background-image: radial-gradient(rgba(251, 191, 36, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
