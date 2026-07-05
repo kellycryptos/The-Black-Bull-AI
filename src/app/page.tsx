@@ -427,9 +427,10 @@ export default function Home() {
       {/* 2. Main content area: Checker + Chat */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        {/* LEFT COLUMN: Allocation Checker */}
+        {/* LEFT COLUMN: Allocation Checker & Guide */}
         <section className="lg:col-span-5 flex flex-col gap-6">
-          <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 green-glow-border relative overflow-hidden flex-1 justify-start">
+          {/* Main Simulator Card */}
+          <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 green-glow-border relative overflow-hidden justify-start">
             {/* Ambient Background Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 blur-3xl rounded-full -z-10" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-gold/5 blur-3xl rounded-full -z-10" />
@@ -561,6 +562,24 @@ export default function Home() {
                   "{balanceData.message}"
                 </p>
 
+                {/* Bullpen Referral CTA */}
+                <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
+                  <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
+                    Claim Real $ANSEM Rewards
+                  </span>
+                  <p className="text-xs text-gray-300 font-semibold leading-relaxed">
+                    Want to claim $ANSEM airdrop / rewards? Use my Bullpen referral:
+                  </p>
+                  <a
+                    href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
+                  >
+                    🚀 Claim via Bullpen
+                  </a>
+                </div>
+
                 {/* Viral Sharing Controls */}
                 <div className="grid grid-cols-2 gap-3 mt-1">
                   <button
@@ -590,6 +609,54 @@ export default function Home() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Collapsible Guide Card */}
+          <div className="glass-panel rounded-3xl p-5 green-glow-border flex flex-col gap-3">
+            <details className="group">
+              <summary className="list-none flex items-center justify-between cursor-pointer font-extrabold text-xs text-white uppercase tracking-wider select-none">
+                <span className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-brand-green animate-pulse" />
+                  How to Get Involved & Claim Guide
+                </span>
+                <span className="transition-transform duration-300 group-open:rotate-180 text-brand-green text-[10px]">
+                  ▼
+                </span>
+              </summary>
+              <div className="mt-4 border-t border-white/5 pt-4 flex flex-col gap-3.5 text-xs text-gray-300 leading-relaxed">
+                <div className="flex gap-3">
+                  <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">1</span>
+                  <div>
+                    <p className="font-bold text-white mb-0.5">Visit Bullpen</p>
+                    <p>Go to the Kellycryptos profile at <a href="https://bullpen.fi/@Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">bullpen.fi/@Kellycryptos</a></p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-3">
+                  <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">2</span>
+                  <div>
+                    <p className="font-bold text-white mb-0.5">Connect X (Twitter) Account</p>
+                    <p>Link your Twitter account to sync your active social profile with the bullpen platform.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">3</span>
+                  <div>
+                    <p className="font-bold text-white mb-0.5">Link Your Solana Wallet</p>
+                    <p>Connect or import the specific Solana wallet containing your $ANSEM memecoins to register your holding weight.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">4</span>
+                  <div>
+                    <p className="font-bold text-white mb-0.5">Participate & Multiply Rewards</p>
+                    <p>Interact with active threads, write community bullposts, and secure your real allocations on the platform!</p>
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
         </section>
 
@@ -722,9 +789,20 @@ export default function Home() {
             <Twitter className="w-3.5 h-3.5 fill-current" /> Built by @kellycryptos
           </a>
         </div>
-        <span className="text-[10px] text-gray-600 font-mono">
-          Mint Address: 9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump
-        </span>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <a
+            href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-gold hover:text-brand-gold-dark hover:underline font-bold transition-all duration-300"
+          >
+            🔥 Claim $ANSEM Rewards (Ref: Kellycryptos)
+          </a>
+          <span className="hidden sm:inline text-gray-700">|</span>
+          <span className="text-[10px] text-gray-600 font-mono">
+            Mint: 9cRC...PvTGpump
+          </span>
+        </div>
       </footer>
     </div>
   );
