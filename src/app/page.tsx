@@ -492,7 +492,7 @@ export default function Home() {
       {/* 2. Main content area: Checker + Chat */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        {/* LEFT COLUMN: Allocation Checker & Guide */}
+        {/* LEFT COLUMN: Allocation Checker, Onboarding Guide & FAQ */}
         <section className="lg:col-span-5 flex flex-col gap-6">
           {/* Main Simulator Card */}
           <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 green-glow-border relative overflow-hidden justify-start">
@@ -695,7 +695,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Collapsible Guide Card */}
+          {/* Collapsible Onboarding Guide Card */}
           <div className="glass-panel rounded-3xl p-5 green-glow-border flex flex-col gap-3">
             <details className="group">
               <summary className="list-none flex items-center justify-between cursor-pointer font-extrabold text-xs text-white uppercase tracking-wider select-none">
@@ -739,6 +739,106 @@ export default function Home() {
                     <p>Interact with active threads, write community bullposts, and secure your real allocations on the platform!</p>
                   </div>
                 </div>
+              </div>
+            </details>
+          </div>
+
+          {/* Collapsible FAQ Onboarding Card */}
+          <div className="glass-panel rounded-3xl p-5 green-glow-border flex flex-col gap-3">
+            <details className="group">
+              <summary className="list-none flex items-center justify-between cursor-pointer font-extrabold text-xs text-white uppercase tracking-wider select-none">
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-brand-green animate-pulse" />
+                  FAQ - New to Crypto? Start Here
+                </span>
+                <span className="transition-transform duration-300 group-open:rotate-180 text-brand-green text-[10px]">
+                  ▼
+                </span>
+              </summary>
+              
+              <div className="mt-4 border-t border-white/5 pt-4 flex flex-col gap-3.5 text-xs text-gray-300 leading-relaxed">
+                
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>1. What is $ANSEM (The Black Bull)?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+                    $ANSEM is the official community token inspired by the legend of the Black Bull—the ultimate force in the Solana trenches. It is more than just a coin; it's a movement focused on community, strength, and charging forward together!
+                  </p>
+                </details>
+
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>2. How do I buy $ANSEM?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <div className="mt-2 text-xs text-gray-400 leading-relaxed flex flex-col gap-1.5">
+                    <p>Buying $ANSEM is easy, even for beginners:</p>
+                    <ol className="list-decimal pl-4 flex flex-col gap-1">
+                      <li>Create a Solana wallet (like <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline">Phantom</a> or <a href="https://solflare.com" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline">Solflare</a>).</li>
+                      <li>Fund it with SOL (buy SOL from an exchange like Coinbase, Binance, or Kraken and send it to your wallet address).</li>
+                      <li>Go to a decentralized swap like <a href="https://jup.ag" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">Jupiter</a> or Raydium, paste the mint address: <code className="bg-black/45 px-1 py-0.5 rounded font-mono text-[10px] text-brand-gold select-all">9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</code>, and swap SOL for $ANSEM.</li>
+                    </ol>
+                  </div>
+                </details>
+
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>3. What is Bullpen and why should I use it?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+                    Bullpen is the all-in-one platform for the Solana memecoin community. Instead of hopping between various websites, Bullpen combines reward claims, community tracking, and social bullposting in one single profile! Claim here using our referral: <a href="https://app.bullpen.fi/claim?ref=Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim?ref=Kellycryptos</a>.
+                  </p>
+                </details>
+
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>4. How do I claim rewards / airdrop on Bullpen?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+                    Claiming is simple: visit the Kellycryptos profile at <a href="https://bullpen.fi/@Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">bullpen.fi/@Kellycryptos</a>, connect your X (Twitter) account to verify your active status, import the Solana wallet holding your $ANSEM tokens, and participate on the platform to multiply your rewards!
+                  </p>
+                </details>
+
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>5. Is this safe? (Wallet + security tips)</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <div className="mt-2 text-xs text-gray-400 leading-relaxed flex flex-col gap-1.5">
+                    <p>Yes, 100% safe! This Oracle only scans public blockchain balances. We will <b>never</b> ask for your private keys, seed phrases, or credentials.</p>
+                    <p className="font-bold text-white">Critical Security Tips:</p>
+                    <ul className="list-disc pl-4 flex flex-col gap-1">
+                      <li>Never share your seed phrase or private key with anyone.</li>
+                      <li>Always double-check website URLs before linking your wallet.</li>
+                      <li>Consider using a separate "burner" wallet for testing new tools.</li>
+                    </ul>
+                  </div>
+                </details>
+
+                <details className="group/item border-b border-white/5 pb-2">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>6. What is my allocation card for?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+                    Your allocation card ranks your Solana wallet holdings and calculates your simulated airdrop. Click <b>Copy Image</b> to copy it directly, or <b>Download Card</b>, and paste it into your X posts to show off your rank, invite others to test their bags, and build the herd!
+                  </p>
+                </details>
+
+                <details className="group/item">
+                  <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
+                    <span>7. How can I join the community?</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                  </summary>
+                  <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+                    Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts on Bullpen, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
+                  </p>
+                </details>
+                
               </div>
             </details>
           </div>
