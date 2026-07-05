@@ -980,22 +980,6 @@ export default function Home() {
                       "{balanceData.message}"
                     </p>
 
-                    <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
-                      <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
-                        Claim Real $ANSEM Rewards
-                      </span>
-                      <p className="text-xs text-gray-300 font-semibold leading-relaxed">
-                        Want to claim your rewards? Visit the Bullpen claim page:
-                      </p>
-                      <a
-                        href="https://app.bullpen.fi/claim"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
-                      >
-                        🚀 Claim via Bullpen
-                      </a>
-                    </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-1">
                       <button
