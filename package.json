@@ -9,13 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@solana/web3.js": "^1.95.8",
+    "@vercel/analytics": "^2.0.1",
+    "groq-sdk": "^0.12.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.436.0",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "groq-sdk": "^0.12.0",
-    "@solana/web3.js": "^1.95.8",
-    "lucide-react": "^0.436.0",
-    "html2canvas": "^1.4.1"
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
