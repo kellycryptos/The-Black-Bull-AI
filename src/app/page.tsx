@@ -575,21 +575,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-[rgba(0,0,0,0.45)] z-10" />
 
           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
-                <img
-                  src={cardAvatarUrl}
-                  className="w-full h-full object-cover"
-                  alt="logo"
-                  crossOrigin="anonymous"
-                  referrerPolicy="no-referrer"
-                  onError={handleAvatarError}
-                />
-              </div>
-              <div>
-                <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-                <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">ANSEM ORACLE</span>
-              </div>
+            <div>
+              <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
+              <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">ANSEM ORACLE</span>
             </div>
             <div className="text-right">
               <span className="text-xs font-black text-brand-gold">$ANSEM</span>
@@ -597,15 +585,27 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center gap-3 py-4 text-center relative z-20">
-            <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest">
+          <div className="flex-1 flex flex-col justify-center gap-2.5 py-3 text-center relative z-20">
+            {/* Centered User Avatar */}
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-brand-green/20">
+              <img
+                src={cardAvatarUrl}
+                className="w-full h-full object-cover"
+                alt="logo"
+                crossOrigin="anonymous"
+                referrerPolicy="no-referrer"
+                onError={handleAvatarError}
+              />
+            </div>
+            
+            <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest mt-1">
               Trench Classification
             </div>
-            <div className="text-2xl font-black text-white uppercase tracking-wider glow-text-green leading-none">
+            <div className="text-xl font-black text-white uppercase tracking-wider glow-text-green leading-none">
               {balanceData.tier}
             </div>
 
-            <div className="bg-[rgba(0,0,0,0.6)] border border-[rgba(255,255,255,0.1)] py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
+            <div className="bg-[rgba(0,0,0,0.6)] border border-[rgba(255,255,255,0.1)] py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
               <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
@@ -647,21 +647,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-[rgba(0,0,0,0.45)] z-10" />
 
         <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
-              <img
-                src={cardAvatarUrl}
-                className="w-full h-full object-cover"
-                alt="logo"
-                crossOrigin="anonymous"
-                referrerPolicy="no-referrer"
-                onError={handleAvatarError}
-              />
-            </div>
-            <div>
-              <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-              <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SIMULATION ORACLE</span>
-            </div>
+          <div>
+            <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
+            <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SIMULATION ORACLE</span>
           </div>
           <div className="text-right">
             <span className="text-xs font-black text-brand-gold">$ANSEM</span>
@@ -669,8 +657,20 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center gap-2 py-4 text-center relative z-20">
-          <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest">
+        <div className="flex-1 flex flex-col justify-center gap-2 py-3 text-center relative z-20">
+          {/* Centered User Avatar */}
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-brand-green/20">
+            <img
+              src={cardAvatarUrl}
+              className="w-full h-full object-cover"
+              alt="logo"
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
+              onError={handleAvatarError}
+            />
+          </div>
+
+          <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest mt-1">
             Speculative Bull Allocation
           </div>
           <div className="text-xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
