@@ -208,7 +208,7 @@ export default function Home() {
 
   // HTML2Canvas Image download trigger for Scanner Card
   const downloadShareCard = async () => {
-    const cardElement = document.getElementById('share-card-canvas-source');
+    const cardElement = document.getElementById('allocation-card');
     if (!cardElement) return;
 
     setGeneratingCard(true);
@@ -219,7 +219,7 @@ export default function Home() {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
       });
 
@@ -238,7 +238,7 @@ export default function Home() {
 
   // Copy Image to Clipboard for Scanner Card
   const copyShareCard = async () => {
-    const cardElement = document.getElementById('share-card-canvas-source');
+    const cardElement = document.getElementById('allocation-card');
     if (!cardElement) return;
 
     setCopyingCard(true);
@@ -249,7 +249,7 @@ export default function Home() {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
       });
 
@@ -282,7 +282,7 @@ export default function Home() {
   const shareToX = () => {
     if (!balanceData) return;
 
-    const baseText = `Just scanned my bags on The Black Bull AI Oracle! 🐂🔥\n\nClassification: ${balanceData.tier}\nSimulated Allocation: ${balanceData.allocationAmount.toLocaleString()} $ANSEM\n\nBuilt by @kellycryptos\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
+    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nClassification: ${balanceData.tier}\nSimulated Allocation: ${balanceData.allocationAmount.toLocaleString()} $ANSEM\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseText)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -300,7 +300,7 @@ export default function Home() {
 
   // HTML2Canvas Image download trigger for Simulator Card
   const downloadSimCard = async () => {
-    const cardElement = document.getElementById('simulator-card-canvas-source');
+    const cardElement = document.getElementById('simulator-card');
     if (!cardElement) return;
 
     setGeneratingCard(true);
@@ -311,7 +311,7 @@ export default function Home() {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
       });
 
@@ -330,7 +330,7 @@ export default function Home() {
 
   // Copy Image to Clipboard for Simulator Card
   const copySimCard = async () => {
-    const cardElement = document.getElementById('simulator-card-canvas-source');
+    const cardElement = document.getElementById('simulator-card');
     if (!cardElement) return;
 
     setCopyingCard(true);
@@ -341,7 +341,7 @@ export default function Home() {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
       });
 
@@ -373,7 +373,7 @@ export default function Home() {
   // Open Twitter Web Intent for Simulator results
   const shareSimToX = () => {
     const formatMcVal = formatMarketCap(selectedMarketCap);
-    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nEstimated Allocation: ${simAllocation.toLocaleString()} $ANSEM\nProjected USD Worth: $${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} (at ${formatMcVal} MC)\n\nClaim here (Ref: Kellycryptos):\nhttps://app.bullpen.fi/claim?ref=Kellycryptos\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
+    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nEstimated Allocation: ${simAllocation.toLocaleString()} $ANSEM\nProjected USD Worth: $${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} (at ${formatMcVal} MC)\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseText)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -464,7 +464,7 @@ export default function Home() {
       {/* Scanner Card Canvas */}
       {balanceData && (
         <div
-          id="share-card-canvas-source"
+          id="allocation-card"
           className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
         >
           <img
@@ -533,7 +533,7 @@ export default function Home() {
 
       {/* Simulator Card Canvas */}
       <div
-        id="simulator-card-canvas-source"
+        id="simulator-card"
         className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
       >
         <img
@@ -667,7 +667,7 @@ export default function Home() {
       {/* ---------------- 2. MAIN WORKSPACE ---------------- */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        {/* LEFT COLUMN: Allocation Checker / Simulator Card, Onboarding Guide & FAQ */}
+        {/* LEFT COLUMN: Allocation Checker, Onboarding Guide & FAQ */}
         <section className="lg:col-span-5 flex flex-col gap-6">
           
           {/* Main Simulator/Scanner Glass Panel */}
@@ -1201,7 +1201,7 @@ export default function Home() {
                 <details className="group/item">
                   <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
                     <span>7. How can I join the community?</span>
-                    <span className="transition-transform duration-300 group-open:item:rotate-180 text-brand-green text-[10px]">▼</span>
+                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
                     Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts on Bullpen, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
