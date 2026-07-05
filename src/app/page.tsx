@@ -493,7 +493,7 @@ export default function Home() {
       {balanceData && (
         <div
           id="allocation-card"
-          className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
+          className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-[#000000] border-2 border-[#10b981] flex flex-col justify-between p-6 text-[#ffffff] font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
         >
           <img
             src="/black-bull-logo.jpg"
@@ -504,18 +504,18 @@ export default function Home() {
 
           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
             <div>
-              <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-              <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">ANSEM ORACLE</span>
+              <h2 className="text-lg font-black text-[#ffffff] leading-none tracking-tight">THE BLACK BULL AI</h2>
+              <span className="text-[9px] text-[#10b981] font-bold tracking-widest uppercase">ANSEM ORACLE</span>
             </div>
             <div className="text-right">
-              <span className="text-xs font-black text-brand-gold">$ANSEM</span>
+              <span className="text-xs font-black text-[#fbbf24]">$ANSEM</span>
               <p className="text-[7px] text-[#6b7280] font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col justify-center gap-2.5 py-3 text-center relative z-20">
             {/* Centered User Avatar */}
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
               <img
                 src={cardAvatarUrl}
                 className="w-full h-full object-cover"
@@ -529,7 +529,7 @@ export default function Home() {
             <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest mt-1">
               Trench Classification
             </div>
-            <div className="text-xl font-black text-white uppercase tracking-wider glow-text-green leading-none">
+            <div className="text-xl font-black text-[#ffffff] uppercase tracking-wider glow-text-green leading-none">
               {balanceData.tier}
             </div>
 
@@ -537,13 +537,13 @@ export default function Home() {
               <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
-              <span className="text-2xl font-black text-brand-green font-mono block my-0.5">
+              <span className="text-2xl font-black text-[#10b981] font-mono block my-0.5">
                 {balanceData.allocationAmount.toLocaleString()}
               </span>
               <span className="text-[9px] text-[#9ca3af] block font-bold uppercase tracking-widest">
                 $ANSEM tokens
               </span>
-              <span className="text-lg font-black text-brand-gold font-mono block mt-0.5">
+              <span className="text-lg font-black text-[#fbbf24] font-mono block mt-0.5">
                 ${(balanceData.allocationAmount * 0.3).toLocaleString(undefined, { maximumFractionDigits: 0 })} USD
               </span>
             </div>
@@ -554,7 +554,7 @@ export default function Home() {
               <span>User: {balanceData.xHandle ? `@${balanceData.xHandle}` : 'Anon Calf'}</span>
             </div>
             <div className="text-right flex flex-col gap-0.5">
-              <span className="text-brand-green">Built by @kellycryptos</span>
+              <span className="text-[#10b981]">Built by @kellycryptos</span>
               <span className="text-[8px] text-[#4b5563] font-mono">the-black-bull-ai.vercel.app</span>
             </div>
           </div>
@@ -565,7 +565,7 @@ export default function Home() {
       {/* WARNING: inside this element, only use literal hex/rgba values (bg-[#...], text-[rgba(...)]) — do NOT use default Tailwind palette classes OR /opacity modifier syntax (e.g. bg-black/60, text-gray-400). Tailwind v4 compiles both to oklch()/color-mix(), which html2canvas cannot parse and will silently break PNG/clipboard export. */}
       <div
         id="simulator-card"
-        className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
+        className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-[#000000] border-2 border-[#10b981] flex flex-col justify-between p-6 text-[#ffffff] font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
       >
         <img
           src="/black-bull-logo.jpg"
@@ -576,18 +576,18 @@ export default function Home() {
 
         <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
           <div>
-            <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-            <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SIMULATION ORACLE</span>
+            <h2 className="text-lg font-black text-[#ffffff] leading-none tracking-tight">THE BLACK BULL AI</h2>
+            <span className="text-[9px] text-[#10b981] font-bold tracking-widest uppercase">SIMULATION ORACLE</span>
           </div>
           <div className="text-right">
-            <span className="text-xs font-black text-brand-gold">$ANSEM</span>
+            <span className="text-xs font-black text-[#fbbf24]">$ANSEM</span>
             <p className="text-[7px] text-[#6b7280] font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center gap-2 py-3 text-center relative z-20">
           {/* Centered User Avatar */}
-          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brand-green mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
             <img
               src={cardAvatarUrl}
               className="w-full h-full object-cover"
@@ -601,7 +601,7 @@ export default function Home() {
           <div className="text-[9px] text-[#9ca3af] font-extrabold uppercase tracking-widest mt-1">
             Speculative Bull Allocation
           </div>
-          <div className="text-xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
+          <div className="text-xl font-black text-[#10b981] font-mono tracking-tight glow-text-green leading-none">
             {simAllocation.toLocaleString()} $ANSEM
           </div>
 
@@ -609,7 +609,7 @@ export default function Home() {
             <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
               Projected Valuation (at {formatMarketCap(selectedMarketCap)} MC)
             </span>
-            <span className="text-2xl font-black text-brand-gold font-mono block my-0.5">
+            <span className="text-2xl font-black text-[#fbbf24] font-mono block my-0.5">
               ${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD
             </span>
           </div>
@@ -623,7 +623,7 @@ export default function Home() {
             </span>
           </div>
           <div className="text-right flex flex-col gap-0.5">
-            <span className="text-brand-green">Built by @kellycryptos</span>
+            <span className="text-[#10b981]">Built by @kellycryptos</span>
             <span className="text-[8px] text-[#4b5563] font-mono">the-black-bull-ai.vercel.app</span>
           </div>
         </div>
