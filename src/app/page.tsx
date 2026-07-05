@@ -1319,7 +1319,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open:item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
+                    Follow <a href="https://x.com/blknoiz06" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@blknoiz06</a> on X (Twitter), start creating bullposts, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
                   </p>
                 </details>
                 
