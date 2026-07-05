@@ -66,22 +66,26 @@ ${walletContext}
     ];
 
     let reply = '';
-    // 4. Try Qwen model first, fall back to Llama if rate-limited or unavailable
+    // 4. Try primary model first, fall back if rate-limited or unavailable
     try {
-      console.log('[API] Attempting completion using model llama-3.3-70b-versatile...');
+      console.log('[API] Attempting completion using model openai/gpt-oss-120b...');
       const chatCompletion = await groq.chat.completions.create({
         messages: formattedMessages,
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         temperature: 0.8,
         max_tokens: 400,
       });
       reply = chatCompletion.choices[0]?.message?.content || '';
-    } catch (llamaError: any) {
-      console.warn('[API] Llama 3.3 model failed, falling back to Llama 3.1-8b...', llamaError.message || llamaError);
+    } catch (primaryError: any) {
+      console.warn('[API] Primary model (openai/gpt-oss-120b) failed, falling back to openai/gpt-oss-20b...', {
+        status: primaryError?.status,
+        message: primaryError?.message || primaryError,
+        error: primaryError?.error
+      });
       
       const chatCompletion = await groq.chat.completions.create({
         messages: formattedMessages,
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         temperature: 0.8,
         max_tokens: 400,
       });
@@ -93,7 +97,12 @@ ${walletContext}
       reply,
     });
   } catch (err: any) {
-    console.error('[API] Chat completion error:', err.message || err);
+    console.error('[API] Chat completion error detail:', {
+      status: err?.status,
+      message: err?.message || err,
+      error: err?.error,
+      stack: err?.stack
+    });
     return NextResponse.json(
       {
         success: false,

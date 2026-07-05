@@ -223,14 +223,13 @@ export default function Home() {
     }
   };
 
-  // HTML2Canvas Image download trigger for Scanner Card
   const downloadShareCard = async () => {
-    const cardElement = document.getElementById('allocation-card');
+    const cardElement = document.getElementById('allocation-card') as HTMLElement | null;
     if (!cardElement) return;
 
     setGeneratingCard(true);
+    cardElement.style.opacity = '1'; // Reveal for capture — html2canvas respects CSS opacity
     try {
-      // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
       }
@@ -245,7 +244,7 @@ export default function Home() {
       }
 
       const canvas = await html2canvas(cardElement, {
-        scale: 2, // High DPI capture
+        scale: 2,
         backgroundColor: '#000000',
         useCORS: true,
         allowTaint: false,
@@ -260,7 +259,6 @@ export default function Home() {
     } catch (err: any) {
       console.error('[Canvas] Standard PNG download failed, attempting fallback without X avatar:', err);
       try {
-        // Fallback: Temporarily set avatar to local logo
         setCardAvatarUrl('/black-bull-logo.jpg');
         await new Promise((resolve) => setTimeout(resolve, 150));
 
@@ -281,27 +279,27 @@ export default function Home() {
         console.error('[Canvas] Fallback PNG download failed:', fallbackErr);
         alert('Failed to generate PNG image card, calf!');
       } finally {
-        // Restore original avatar
         setCardAvatarUrl(avatarUrl);
       }
     } finally {
+      cardElement.style.opacity = ''; // Restore hidden state
       setGeneratingCard(false);
     }
   };
 
   // Copy Image to Clipboard for Scanner Card
   const copyShareCard = async () => {
-    const cardElement = document.getElementById('allocation-card');
+    const cardElement = document.getElementById('allocation-card') as HTMLElement | null;
     if (!cardElement) return;
 
     setCopyingCard(true);
+    cardElement.style.opacity = '1'; // Reveal for capture
     try {
-      // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
       }
 
-      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      // Pre-flight avatar check
       const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
       console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
       if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
@@ -311,7 +309,7 @@ export default function Home() {
       }
 
       const canvas = await html2canvas(cardElement, {
-        scale: 2, // High DPI capture
+        scale: 2,
         backgroundColor: '#000000',
         useCORS: true,
         allowTaint: false,
@@ -319,61 +317,37 @@ export default function Home() {
       });
 
       canvas.toBlob(async (blob) => {
-        if (!blob) {
-          alert('Failed to generate image blob, calf!');
-          setCopyingCard(false);
-          return;
-        }
+        if (!blob) { alert('Failed to generate image blob, calf!'); setCopyingCard(false); return; }
         try {
-          const item = new ClipboardItem({ 'image/png': blob });
-          await navigator.clipboard.write([item]);
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
           alert('📋 Card image copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
         } catch (clipErr: any) {
           console.error('[Clipboard] Failed to write image:', clipErr);
           alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
           downloadShareCard();
-        } finally {
-          setCopyingCard(false);
-        }
+        } finally { setCopyingCard(false); }
       }, 'image/png');
     } catch (err: any) {
-      console.error('[Canvas] Standard PNG copy failed, attempting fallback without X avatar:', err);
+      console.error('[Canvas] Standard PNG copy failed, attempting fallback:', err);
       try {
         setCardAvatarUrl('/black-bull-logo.jpg');
         await new Promise((resolve) => setTimeout(resolve, 150));
-
-        const canvas = await html2canvas(cardElement, {
-          scale: 2,
-          backgroundColor: '#000000',
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-        });
-
+        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
         canvas.toBlob(async (blob) => {
-          if (!blob) {
-            alert('Failed to generate fallback image blob, calf!');
-            setCopyingCard(false);
-            return;
-          }
+          if (!blob) { alert('Failed to generate fallback image blob, calf!'); setCopyingCard(false); return; }
           try {
-            const item = new ClipboardItem({ 'image/png': blob });
-            await navigator.clipboard.write([item]);
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             alert('📋 Card image (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
-          } catch (clipErr: any) {
-            console.error('[Clipboard fallback] Failed to write image:', clipErr);
-            downloadShareCard();
-          } finally {
-            setCopyingCard(false);
-          }
+          } catch (clipErr: any) { downloadShareCard(); }
+          finally { setCopyingCard(false); }
         }, 'image/png');
       } catch (fallbackErr: any) {
         console.error('[Canvas] Fallback PNG copy failed:', fallbackErr);
         alert('Failed to copy card, calf!');
         setCopyingCard(false);
-      } finally {
-        setCardAvatarUrl(avatarUrl);
-      }
+      } finally { setCardAvatarUrl(avatarUrl); }
+    } finally {
+      cardElement.style.opacity = ''; // Restore hidden state
     }
   };
 
@@ -399,17 +373,17 @@ export default function Home() {
 
   // HTML2Canvas Image download trigger for Simulator Card
   const downloadSimCard = async () => {
-    const cardElement = document.getElementById('simulator-card');
+    const cardElement = document.getElementById('simulator-card') as HTMLElement | null;
     if (!cardElement) return;
 
     setGeneratingCard(true);
+    cardElement.style.opacity = '1'; // Reveal for capture
     try {
-      // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
       }
 
-      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      // Pre-flight avatar check
       const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
       console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
       if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
@@ -419,7 +393,7 @@ export default function Home() {
       }
 
       const canvas = await html2canvas(cardElement, {
-        scale: 2, // High DPI capture
+        scale: 2,
         backgroundColor: '#000000',
         useCORS: true,
         allowTaint: false,
@@ -436,15 +410,7 @@ export default function Home() {
       try {
         setCardAvatarUrl('/black-bull-logo.jpg');
         await new Promise((resolve) => setTimeout(resolve, 150));
-
-        const canvas = await html2canvas(cardElement, {
-          scale: 2,
-          backgroundColor: '#000000',
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-        });
-
+        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
         const imgData = canvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
         downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
@@ -453,27 +419,26 @@ export default function Home() {
       } catch (fallbackErr: any) {
         console.error('[Canvas] Fallback Simulator PNG download failed:', fallbackErr);
         alert('Failed to generate PNG image card, calf!');
-      } finally {
-        setCardAvatarUrl(avatarUrl);
-      }
+      } finally { setCardAvatarUrl(avatarUrl); }
     } finally {
+      cardElement.style.opacity = ''; // Restore hidden state
       setGeneratingCard(false);
     }
   };
 
   // Copy Image to Clipboard for Simulator Card
   const copySimCard = async () => {
-    const cardElement = document.getElementById('simulator-card');
+    const cardElement = document.getElementById('simulator-card') as HTMLElement | null;
     if (!cardElement) return;
 
     setCopyingCard(true);
+    cardElement.style.opacity = '1'; // Reveal for capture
     try {
-      // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
       }
 
-      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      // Pre-flight avatar check
       const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
       console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
       if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
@@ -483,7 +448,7 @@ export default function Home() {
       }
 
       const canvas = await html2canvas(cardElement, {
-        scale: 2, // High DPI capture
+        scale: 2,
         backgroundColor: '#000000',
         useCORS: true,
         allowTaint: false,
@@ -491,61 +456,37 @@ export default function Home() {
       });
 
       canvas.toBlob(async (blob) => {
-        if (!blob) {
-          alert('Failed to generate image blob, calf!');
-          setCopyingCard(false);
-          return;
-        }
+        if (!blob) { alert('Failed to generate image blob, calf!'); setCopyingCard(false); return; }
         try {
-          const item = new ClipboardItem({ 'image/png': blob });
-          await navigator.clipboard.write([item]);
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
           alert('📋 Simulation card copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
         } catch (clipErr: any) {
           console.error('[Clipboard] Failed to write image:', clipErr);
           alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
           downloadSimCard();
-        } finally {
-          setCopyingCard(false);
-        }
+        } finally { setCopyingCard(false); }
       }, 'image/png');
     } catch (err: any) {
       console.error('[Canvas] Standard Simulator PNG copy failed, attempting fallback:', err);
       try {
         setCardAvatarUrl('/black-bull-logo.jpg');
         await new Promise((resolve) => setTimeout(resolve, 150));
-
-        const canvas = await html2canvas(cardElement, {
-          scale: 2,
-          backgroundColor: '#000000',
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-        });
-
+        const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#000000', useCORS: true, allowTaint: false, logging: false });
         canvas.toBlob(async (blob) => {
-          if (!blob) {
-            alert('Failed to generate fallback image blob, calf!');
-            setCopyingCard(false);
-            return;
-          }
+          if (!blob) { alert('Failed to generate fallback image blob, calf!'); setCopyingCard(false); return; }
           try {
-            const item = new ClipboardItem({ 'image/png': blob });
-            await navigator.clipboard.write([item]);
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             alert('📋 Simulation card (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
-          } catch (clipErr: any) {
-            console.error('[Clipboard fallback] Failed to write image:', clipErr);
-            downloadSimCard();
-          } finally {
-            setCopyingCard(false);
-          }
+          } catch (clipErr: any) { downloadSimCard(); }
+          finally { setCopyingCard(false); }
         }, 'image/png');
       } catch (fallbackErr: any) {
         console.error('[Canvas] Fallback Simulator PNG copy failed:', fallbackErr);
         alert('Failed to copy card, calf!');
         setCopyingCard(false);
-      } finally {
-        setCardAvatarUrl(avatarUrl);
-      }
+      } finally { setCardAvatarUrl(avatarUrl); }
+    } finally {
+      cardElement.style.opacity = ''; // Restore hidden state
     }
   };
 
