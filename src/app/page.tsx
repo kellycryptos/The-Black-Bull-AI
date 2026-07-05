@@ -1196,7 +1196,7 @@ export default function Home() {
                   <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">1</span>
                   <div>
                     <p className="font-bold text-white mb-0.5">Visit Bullpen</p>
-                    <p>Go to the Bullpen claim page at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a></p>
+                    <p>Go to the Bullpen claim page at <a href="https://app.bullpen.fi/claim?ref=Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a></p>
                   </div>
                 </div>
                 
@@ -1273,7 +1273,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Bullpen is the all-in-one platform for the $ANSEM community. Instead of hopping between different sites, Bullpen combines reward claims, community tracking, leaderboards, and social bullposting — all in one clean profile. You can visit the claim page directly at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>.
+                    Bullpen is the all-in-one platform for the $ANSEM community. Instead of hopping between different sites, Bullpen combines reward claims, community tracking, leaderboards, and social bullposting — all in one clean profile. You can visit the claim page directly at <a href="https://app.bullpen.fi/claim?ref=Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>.
                   </p>
                 </details>
 
@@ -1283,7 +1283,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Claiming is simple: visit the Bullpen claim page at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>, connect your X (Twitter) account to verify your active status, import the Solana wallet holding your $ANSEM tokens, and participate on the platform to multiply your rewards!
+                    Claiming is simple: visit the Bullpen claim page at <a href="https://app.bullpen.fi/claim?ref=Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>, connect your X (Twitter) account to verify your active status, import the Solana wallet holding your $ANSEM tokens, and participate on the platform to multiply your rewards!
                   </p>
                 </details>
 
