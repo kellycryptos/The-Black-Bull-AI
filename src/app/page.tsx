@@ -58,6 +58,9 @@ export default function Home() {
   const [checkerLoading, setCheckerLoading] = useState(false);
   const [checkerError, setCheckerError] = useState<string | null>(null);
 
+  // Dynamic Avatar State
+  const [avatarUrl, setAvatarUrl] = useState('/black-bull-logo.jpg');
+
   // Card Generation States
   const [generatingCard, setGeneratingCard] = useState(false);
   const [copyingCard, setCopyingCard] = useState(false);
@@ -87,6 +90,16 @@ export default function Home() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatLoading]);
+
+  // 3. Resolve X profile picture when checked data updates
+  useEffect(() => {
+    if (balanceData?.xHandle) {
+      const cleanHandle = balanceData.xHandle.trim().replace(/^@/, '');
+      setAvatarUrl(`https://unavatar.io/twitter/${cleanHandle}`);
+    } else {
+      setAvatarUrl('/black-bull-logo.jpg');
+    }
+  }, [balanceData]);
 
   // Fetch token price function
   const fetchPrice = async () => {
@@ -327,6 +340,11 @@ export default function Home() {
     handleSendMessage(prompt);
   };
 
+  // Fallback for avatar image loading errors
+  const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = '/black-bull-logo.jpg';
+  };
+
   return (
     <div className="flex-1 w-full trench-grid bg-brand-black flex flex-col justify-between py-6 px-4 sm:px-8 max-w-7xl mx-auto relative">
       
@@ -350,9 +368,10 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
                 <img
-                  src="/black-bull-logo.jpg"
+                  src={avatarUrl}
                   className="w-full h-full object-cover"
                   alt="logo"
+                  onError={handleAvatarError}
                 />
               </div>
               <div>
@@ -576,13 +595,23 @@ export default function Home() {
             {balanceData && (
               <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 animate-fadeIn">
                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-                      Detected Weight
-                    </span>
-                    <span className="text-sm font-mono font-bold text-white">
-                      {balanceData.formattedBalance} $ANSEM
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-green relative">
+                      <img
+                        src={avatarUrl}
+                        className="w-full h-full object-cover"
+                        alt="user avatar"
+                        onError={handleAvatarError}
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                        Detected Weight
+                      </span>
+                      <span className="text-sm font-mono font-bold text-white">
+                        {balanceData.formattedBalance} $ANSEM
+                      </span>
+                    </div>
                   </div>
                   <div className="bg-brand-green/10 border border-brand-green/30 text-brand-green font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
                     {balanceData.tier}
