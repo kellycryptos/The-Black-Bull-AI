@@ -105,7 +105,7 @@ export default function Home() {
     {
       role: 'assistant',
       content:
-        "LISTEN UP, CALF! 🐂 I am The Black Bull, and I run these Solana trenches. Paste your wallet address above to check your $ANSEM weight, claim your simulated allocation, and let's see if you're a jeet or a certified Chad! Ask me anything, or hit the buttons below to charge forward!",
+        "LISTEN UP, CALF! 🐂 I am The Black Bull, and I run these Solana trenches. Paste your wallet address above to check your @blknoiz06 (The Black Bull / $ANSEM) weight, claim your simulated allocation, and let's see if you're a jeet or a certified Chad! Ask me anything, or hit the buttons below to charge forward!",
     },
   ]);
   const [chatInput, setChatInput] = useState('');
@@ -212,7 +212,7 @@ export default function Home() {
         },
         {
           role: 'assistant',
-          content: `🚨 **BAG DETECTED!** 🚨\n\n${data.message}\n\nBalance: **${data.formattedBalance} $ANSEM**\nTier: **${data.tier}**\nSimulated Airdrop Allocation: **${data.allocationAmount.toLocaleString()} $ANSEM**\n\nWhat are you going to do now, calf? Hold the line or jeet it? Ask me anything!`,
+          content: `🚨 **BAG DETECTED!** 🚨\n\n${data.message}\n\nBalance: **${data.formattedBalance} @blknoiz06 (The Black Bull / $ANSEM)**\nTier: **${data.tier}**\nSimulated Airdrop Allocation: **${data.allocationAmount.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM)**\n\nWhat are you going to do now, calf? Hold the line or jeet it? Ask me anything!`,
         },
       ]);
     } catch (err: any) {
@@ -363,7 +363,7 @@ export default function Home() {
   const shareToX = () => {
     if (!balanceData) return;
 
-    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nClassification: ${balanceData.tier}\nSimulated Allocation: ${balanceData.allocationAmount.toLocaleString()} $ANSEM\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
+    const baseText = `Simulated my potential @blknoiz06 (The Black Bull / $ANSEM) rewards on The Black Bull AI Oracle! 🐂🔥\n\nClassification: ${balanceData.tier}\nSimulated Allocation: ${balanceData.allocationAmount.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM)\n\nCheck yours here: ${window.location.origin}\n\n@blknoiz06 (The Black Bull / $ANSEM) to the moon! 🚀`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseText)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -516,7 +516,7 @@ export default function Home() {
   // Open Twitter Web Intent for Simulator results
   const shareSimToX = () => {
     const formatMcVal = formatMarketCap(selectedMarketCap);
-    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nEstimated Allocation: ${simAllocation.toLocaleString()} $ANSEM\nProjected USD Worth: $${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} (at ${formatMcVal} MC)\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
+    const baseText = `Simulated my potential @blknoiz06 (The Black Bull / $ANSEM) rewards on The Black Bull AI Oracle! 🐂🔥\n\nEstimated Allocation: ${simAllocation.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM)\nProjected USD Worth: $${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} (at ${formatMcVal} MC)\n\nCheck yours here: ${window.location.origin}\n\n@blknoiz06 (The Black Bull / $ANSEM) to the moon! 🚀`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseText)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -581,13 +581,13 @@ export default function Home() {
     let prompt = '';
     switch (actionType) {
       case 'price':
-        prompt = 'Give me a savage price prediction for $ANSEM. Do not hold back, use the current price if you know it!';
+        prompt = 'Give me a savage price prediction for @blknoiz06 (The Black Bull / $ANSEM). Do not hold back, use the current price if you know it!';
         break;
       case 'lore':
-        prompt = 'Explain the sacred lore of $ANSEM and the legend of the Black Bull.';
+        prompt = 'Explain the sacred lore of @blknoiz06 (The Black Bull / $ANSEM) and the legend of the Black Bull.';
         break;
       case 'roast':
-        prompt = 'Savage roast my bags and status. Call me out if I am holding zero $ANSEM!';
+        prompt = 'Savage roast my bags and status. Call me out if I am holding zero @blknoiz06 (The Black Bull / $ANSEM)!';
         break;
       case 'motivate':
         prompt = 'GIVE ME THE STRONGEST TRENCH MOTIVATION! Charge forward!';
@@ -635,7 +635,7 @@ export default function Home() {
               </div>
             </div>
             <div className="text-right">
-              <span className="text-base font-black text-brand-gold">$ANSEM</span>
+              <span className="text-xs font-black text-brand-gold">@blknoiz06 (The Black Bull / $ANSEM)</span>
               <p className="text-[7px] text-gray-500 font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
             </div>
           </div>
@@ -652,11 +652,11 @@ export default function Home() {
               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
-              <span className="text-3xl font-black text-brand-green font-mono block my-0.5">
+              <span className="text-2xl font-black text-brand-green font-mono block my-0.5">
                 {balanceData.allocationAmount.toLocaleString()}
               </span>
               <span className="text-[9px] text-gray-400 block font-bold uppercase tracking-widest">
-                $ANSEM tokens
+                @blknoiz06 (The Black Bull / $ANSEM) tokens
               </span>
             </div>
           </div>
@@ -706,7 +706,7 @@ export default function Home() {
             </div>
           </div>
           <div className="text-right">
-            <span className="text-base font-black text-brand-gold">$ANSEM</span>
+            <span className="text-xs font-black text-brand-gold">@blknoiz06 (The Black Bull / $ANSEM)</span>
             <p className="text-[7px] text-gray-500 font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
           </div>
         </div>
@@ -715,8 +715,8 @@ export default function Home() {
           <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
             Speculative Bull Allocation
           </div>
-          <div className="text-2xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
-            {simAllocation.toLocaleString()} $ANSEM
+          <div className="text-xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
+            {simAllocation.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM)
           </div>
 
           <div className="bg-black/60 border border-white/10 py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[260px]">
@@ -733,7 +733,7 @@ export default function Home() {
           <div className="flex flex-col gap-0.5">
             <span>User: {xInput.trim() ? `@${xInput.trim().replace(/^@/, '')}` : 'Anon Calf'}</span>
             <span className="text-[8px] text-gray-600 font-mono">
-              Holdings: {simHoldings.toLocaleString()} $ANSEM | Impressions: {simImpressions.toLocaleString()}
+              Holdings: {simHoldings.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM) | Impressions: {simImpressions.toLocaleString()}
             </span>
           </div>
           <div className="text-right flex flex-col gap-0.5">
@@ -768,7 +768,7 @@ export default function Home() {
           <div className="flex items-center gap-4 bg-black/40 border border-white/5 py-2 px-4 rounded-xl">
             <div className="flex flex-col text-right">
               <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
-                $ANSEM Price
+                @blknoiz06 (The Black Bull / $ANSEM) Price
               </span>
               {priceLoading && !priceData ? (
                 <span className="text-sm font-mono text-brand-green animate-pulse">Loading...</span>
@@ -952,7 +952,7 @@ export default function Home() {
                             Detected Weight
                           </span>
                           <span className="text-sm font-mono font-bold text-white">
-                            {balanceData.formattedBalance} $ANSEM
+                            {balanceData.formattedBalance} @blknoiz06 (The Black Bull / $ANSEM)
                           </span>
                         </div>
                       </div>
@@ -968,11 +968,11 @@ export default function Home() {
                       <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">
                         Airdrop Share
                       </span>
-                      <span className="text-3xl font-black text-brand-green font-mono tracking-tight glow-text-green">
+                      <span className="text-2xl font-black text-brand-green font-mono tracking-tight glow-text-green">
                         {balanceData.allocationAmount.toLocaleString()}
                       </span>
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
-                        $ANSEM tokens
+                        @blknoiz06 (The Black Bull / $ANSEM) tokens
                       </span>
                     </div>
 
@@ -982,13 +982,13 @@ export default function Home() {
 
                     <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
                       <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
-                        Claim Real $ANSEM Rewards
+                        Claim Real @blknoiz06 (The Black Bull / $ANSEM) Rewards
                       </span>
                       <p className="text-xs text-gray-300 font-semibold leading-relaxed">
-                        Want to claim $ANSEM airdrop / rewards? Use my Bullpen referral:
+                        Want to claim your rewards? Visit the Bullpen claim page:
                       </p>
                       <a
-                        href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+                        href="https://app.bullpen.fi/claim"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
@@ -1033,7 +1033,7 @@ export default function Home() {
               <div className="flex flex-col gap-4 animate-fadeIn">
                 <div className="bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg">
                   <p className="text-xs text-gray-300 leading-relaxed font-semibold">
-                    Simulate your potential $ANSEM rewards based on your holdings, posting activity, and community allocation!
+                    Simulate your potential @blknoiz06 (The Black Bull / $ANSEM) rewards based on your holdings, posting activity, and community allocation!
                   </p>
                 </div>
 
@@ -1059,7 +1059,7 @@ export default function Home() {
                 {/* Holdings Slider */}
                 <div className="flex flex-col gap-1.5 mt-1">
                   <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                    <span className="text-gray-400">Your $ANSEM Holdings</span>
+                    <span className="text-gray-400">Your @blknoiz06 (The Black Bull / $ANSEM) Holdings</span>
                     <span className="text-brand-green font-mono">{simHoldings.toLocaleString()}</span>
                   </div>
                   <input
@@ -1154,7 +1154,7 @@ export default function Home() {
                       Simulated Allocation
                     </span>
                     <span className="text-2xl font-black text-brand-green font-mono tracking-tight glow-text-green">
-                      {simAllocation.toLocaleString()} $ANSEM
+                      {simAllocation.toLocaleString()} @blknoiz06 (The Black Bull / $ANSEM)
                     </span>
                     <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
                       Projected Value: <span className="text-brand-gold font-black">${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</span>
@@ -1212,7 +1212,7 @@ export default function Home() {
                   <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">1</span>
                   <div>
                     <p className="font-bold text-white mb-0.5">Visit Bullpen</p>
-                    <p>Go to the Kellycryptos profile at <a href="https://bullpen.fi/@Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">bullpen.fi/@Kellycryptos</a></p>
+                    <p>Go to the Bullpen claim page at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a></p>
                   </div>
                 </div>
                 
@@ -1228,7 +1228,7 @@ export default function Home() {
                   <span className="bg-brand-green/20 text-brand-green font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">3</span>
                   <div>
                     <p className="font-bold text-white mb-0.5">Link Your Solana Wallet</p>
-                    <p>Connect or import the specific Solana wallet containing your $ANSEM memecoins to register your holding weight.</p>
+                    <p>Connect or import the specific Solana wallet containing your @blknoiz06 (The Black Bull / $ANSEM) memecoins to register your holding weight.</p>
                   </div>
                 </div>
 
@@ -1260,25 +1260,25 @@ export default function Home() {
                 
                 <details className="group/item border-b border-white/5 pb-2">
                   <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
-                    <span>1. What is $ANSEM (The Black Bull)?</span>
+                    <span>1. What is @blknoiz06 (The Black Bull / $ANSEM)?</span>
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    $ANSEM is the official community token inspired by the legend of the Black Bull—the ultimate force in the Solana trenches. It is more than just a coin; it's a movement focused on community, strength, and charging forward together!
+                    @blknoiz06 (The Black Bull / $ANSEM) is the official community token inspired by the legend of the Black Bull—the ultimate force in the Solana trenches. It is more than just a coin; it's a movement focused on community, strength, and charging forward together!
                   </p>
                 </details>
 
                 <details className="group/item border-b border-white/5 pb-2">
                   <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
-                    <span>2. How do I buy $ANSEM?</span>
+                    <span>2. How do I buy @blknoiz06 (The Black Bull / $ANSEM)?</span>
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <div className="mt-2 text-xs text-gray-400 leading-relaxed flex flex-col gap-1.5">
-                    <p>Buying $ANSEM is easy, even for beginners:</p>
+                    <p>Buying @blknoiz06 (The Black Bull / $ANSEM) is easy, even for beginners:</p>
                     <ol className="list-decimal pl-4 flex flex-col gap-1">
                       <li>Create a Solana wallet (like <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline">Phantom</a> or <a href="https://solflare.com" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline">Solflare</a>).</li>
                       <li>Fund it with SOL (buy SOL from an exchange like Coinbase, Binance, or Kraken and send it to your wallet address).</li>
-                      <li>Go to a decentralized swap like <a href="https://jup.ag" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">Jupiter</a> or Raydium, paste the mint address: <code className="bg-black/45 px-1 py-0.5 rounded font-mono text-[10px] text-brand-gold select-all">9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</code>, and swap SOL for $ANSEM.</li>
+                      <li>Go to a decentralized swap like <a href="https://jup.ag" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">Jupiter</a> or Raydium, paste the mint address: <code className="bg-black/45 px-1 py-0.5 rounded font-mono text-[10px] text-brand-gold select-all">9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump</code>, and swap SOL for @blknoiz06 (The Black Bull / $ANSEM).</li>
                     </ol>
                   </div>
                 </details>
@@ -1289,7 +1289,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Bullpen is the all-in-one platform for the Solana memecoin community. Instead of hopping between various websites, Bullpen combines reward claims, community tracking, and social bullposting in one single profile! Claim here using our referral: <a href="https://app.bullpen.fi/claim?ref=Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim?ref=Kellycryptos</a>.
+                    Bullpen is the all-in-one platform for the @blknoiz06 (The Black Bull / $ANSEM) community. Instead of hopping between different sites, Bullpen combines reward claims, community tracking, leaderboards, and social bullposting — all in one clean profile. You can visit the claim page directly at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>.
                   </p>
                 </details>
 
@@ -1299,7 +1299,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Claiming is simple: visit the Kellycryptos profile at <a href="https://bullpen.fi/@Kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">bullpen.fi/@Kellycryptos</a>, connect your X (Twitter) account to verify your active status, import the Solana wallet holding your $ANSEM tokens, and participate on the platform to multiply your rewards!
+                    Claiming is simple: visit the Bullpen claim page at <a href="https://app.bullpen.fi/claim" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">app.bullpen.fi/claim</a>, connect your X (Twitter) account to verify your active status, import the Solana wallet holding your @blknoiz06 (The Black Bull / $ANSEM) tokens, and participate on the platform to multiply your rewards!
                   </p>
                 </details>
 
@@ -1309,7 +1309,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <div className="mt-2 text-xs text-gray-400 leading-relaxed flex flex-col gap-1.5">
-                    <p>Yes, 100% safe! This Oracle only scans public blockchain balances. We will <b>never</b> ask for your private keys, seed phrases, or credentials.</p>
+                    <p>Yes, 105% safe! This Oracle only scans public blockchain balances. We will <b>never</b> ask for your private keys, seed phrases, or credentials.</p>
                     <p className="font-bold text-white">Critical Security Tips:</p>
                     <ul className="list-disc pl-4 flex flex-col gap-1">
                       <li>Never share your seed phrase or private key with anyone.</li>
@@ -1335,7 +1335,7 @@ export default function Home() {
                     <span className="transition-transform duration-300 group-open:item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-                    Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts on Bullpen, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
+                    Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
                   </p>
                 </details>
                 
@@ -1479,7 +1479,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-brand-gold hover:text-brand-gold-dark hover:underline font-bold transition-all duration-300"
           >
-            🔥 Claim $ANSEM Rewards (Ref: Kellycryptos)
+            🔥 Claim @blknoiz06 (The Black Bull / $ANSEM) Rewards (Ref: Kellycryptos)
           </a>
           <span className="hidden sm:inline text-gray-700">|</span>
           <span className="text-[10px] text-gray-600 font-mono">
