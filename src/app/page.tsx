@@ -717,6 +717,14 @@ export default function Home() {
                 className="object-cover w-full h-full object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-card via-black/40 to-transparent" />
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full overflow-hidden border-2 border-brand-green bg-black shadow-lg shadow-brand-green/30 ring-4 ring-black/40 z-20">
+                <img
+                  src={avatarUrl}
+                  alt="user avatar"
+                  className="w-full h-full object-cover"
+                  onError={handleAvatarError}
+                />
+              </div>
               <div className="absolute bottom-3 left-4">
                 <span className="text-[10px] bg-brand-green/20 border border-brand-green/40 text-brand-green px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                   Oracle Active
