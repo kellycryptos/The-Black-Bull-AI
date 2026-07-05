@@ -962,7 +962,7 @@ export default function Home() {
                   <input
                     type="range"
                     min="5"
-                    max="30"
+                    max="50"
                     step="1"
                     value={simSupplyPct}
                     onChange={(e) => setSimSupplyPct(parseInt(e.target.value))}
@@ -970,8 +970,8 @@ export default function Home() {
                   />
                   <div className="flex justify-between text-[10px] text-gray-500 font-bold font-mono">
                     <span>5%</span>
-                    <span>17.5%</span>
-                    <span>30%</span>
+                    <span>27.5%</span>
+                    <span>50%</span>
                   </div>
                 </div>
 
@@ -1014,23 +1014,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* Referral CTA */}
-                  <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
-                    <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
-                      Secure Your Allocation
-                    </span>
-                    <p className="text-xs text-gray-300 font-semibold leading-relaxed">
-                      Make this simulated allocation a reality! Join the Bullpen claim list:
-                    </p>
-                    <a
-                      href="https://app.bullpen.fi/claim?ref=Kellycryptos"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
-                    >
-                      🚀 Claim via Bullpen
-                    </a>
-                  </div>
+                  {/* Referral CTA removed for cleaner simulation focus */}
 
                   {/* Canvas Buttons */}
                   <div className="grid grid-cols-2 gap-3">
