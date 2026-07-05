@@ -57,6 +57,17 @@ const MARKET_CAP_MILESTONES = [
   10000000000, // $10B
 ];
 
+// Helper to preload external images with CORS configuration
+const preloadImage = (src: string) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.referrerPolicy = 'no-referrer';
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = src;
+  });
+
 export default function Home() {
   // Tab Switcher state
   const [activeTab, setActiveTab] = useState<'scanner' | 'simulator'>('scanner');
@@ -75,8 +86,9 @@ export default function Home() {
   const [checkerLoading, setCheckerLoading] = useState(false);
   const [checkerError, setCheckerError] = useState<string | null>(null);
 
-  // Dynamic Avatar State
+  // Dynamic Avatar States (unavatar.io)
   const [avatarUrl, setAvatarUrl] = useState('/black-bull-logo.jpg');
+  const [cardAvatarUrl, setCardAvatarUrl] = useState('/black-bull-logo.jpg');
 
   // Simulator Sliders State
   const [simHoldings, setSimHoldings] = useState(50000);
@@ -124,6 +136,11 @@ export default function Home() {
       setAvatarUrl('/black-bull-logo.jpg');
     }
   }, [balanceData, xInput, activeTab]);
+
+  // Sync card avatar URL with source avatar URL
+  useEffect(() => {
+    setCardAvatarUrl(avatarUrl);
+  }, [avatarUrl]);
 
   // Fetch token price function
   const fetchPrice = async () => {
@@ -213,7 +230,10 @@ export default function Home() {
 
     setGeneratingCard(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Preload image with CORS
+      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
+        await preloadImage(cardAvatarUrl);
+      }
 
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
@@ -228,9 +248,33 @@ export default function Home() {
       downloadLink.download = `black-bull-allocation-${xInput.trim() || 'anon'}.png`;
       downloadLink.href = imgData;
       downloadLink.click();
-    } catch (err) {
-      console.error('[Canvas] Failed to capture card:', err);
-      alert('Failed to generate PNG image card, calf!');
+    } catch (err: any) {
+      console.error('[Canvas] Standard PNG download failed, attempting fallback without X avatar:', err);
+      try {
+        // Fallback: Temporarily set avatar to local logo
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#000000',
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = `black-bull-allocation-${xInput.trim() || 'anon'}.png`;
+        downloadLink.href = imgData;
+        downloadLink.click();
+      } catch (fallbackErr: any) {
+        console.error('[Canvas] Fallback PNG download failed:', fallbackErr);
+        alert('Failed to generate PNG image card, calf!');
+      } finally {
+        // Restore original avatar
+        setCardAvatarUrl(avatarUrl);
+      }
     } finally {
       setGeneratingCard(false);
     }
@@ -243,7 +287,10 @@ export default function Home() {
 
     setCopyingCard(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Preload image with CORS
+      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
+        await preloadImage(cardAvatarUrl);
+      }
 
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
@@ -271,10 +318,44 @@ export default function Home() {
           setCopyingCard(false);
         }
       }, 'image/png');
-    } catch (err) {
-      console.error('[Canvas] Failed to copy card:', err);
-      alert('Failed to copy card to clipboard.');
-      setCopyingCard(false);
+    } catch (err: any) {
+      console.error('[Canvas] Standard PNG copy failed, attempting fallback without X avatar:', err);
+      try {
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#000000',
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+        });
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            alert('Failed to generate fallback image blob, calf!');
+            setCopyingCard(false);
+            return;
+          }
+          try {
+            const item = new ClipboardItem({ 'image/png': blob });
+            await navigator.clipboard.write([item]);
+            alert('📋 Card image (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
+          } catch (clipErr: any) {
+            console.error('[Clipboard fallback] Failed to write image:', clipErr);
+            downloadShareCard();
+          } finally {
+            setCopyingCard(false);
+          }
+        }, 'image/png');
+      } catch (fallbackErr: any) {
+        console.error('[Canvas] Fallback PNG copy failed:', fallbackErr);
+        alert('Failed to copy card, calf!');
+        setCopyingCard(false);
+      } finally {
+        setCardAvatarUrl(avatarUrl);
+      }
     }
   };
 
@@ -305,7 +386,10 @@ export default function Home() {
 
     setGeneratingCard(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Preload image with CORS
+      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
+        await preloadImage(cardAvatarUrl);
+      }
 
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
@@ -320,9 +404,31 @@ export default function Home() {
       downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
       downloadLink.href = imgData;
       downloadLink.click();
-    } catch (err) {
-      console.error('[Canvas] Failed to capture simulator card:', err);
-      alert('Failed to generate PNG image card, calf!');
+    } catch (err: any) {
+      console.error('[Canvas] Standard Simulator PNG download failed, attempting fallback:', err);
+      try {
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#000000',
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
+        downloadLink.href = imgData;
+        downloadLink.click();
+      } catch (fallbackErr: any) {
+        console.error('[Canvas] Fallback Simulator PNG download failed:', fallbackErr);
+        alert('Failed to generate PNG image card, calf!');
+      } finally {
+        setCardAvatarUrl(avatarUrl);
+      }
     } finally {
       setGeneratingCard(false);
     }
@@ -335,7 +441,10 @@ export default function Home() {
 
     setCopyingCard(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Preload image with CORS
+      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
+        await preloadImage(cardAvatarUrl);
+      }
 
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
@@ -363,10 +472,44 @@ export default function Home() {
           setCopyingCard(false);
         }
       }, 'image/png');
-    } catch (err) {
-      console.error('[Canvas] Failed to copy simulator card:', err);
-      alert('Failed to copy card to clipboard.');
-      setCopyingCard(false);
+    } catch (err: any) {
+      console.error('[Canvas] Standard Simulator PNG copy failed, attempting fallback:', err);
+      try {
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#000000',
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+        });
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            alert('Failed to generate fallback image blob, calf!');
+            setCopyingCard(false);
+            return;
+          }
+          try {
+            const item = new ClipboardItem({ 'image/png': blob });
+            await navigator.clipboard.write([item]);
+            alert('📋 Simulation card (fallback) copied to clipboard! Paste it into X (Ctrl+V).');
+          } catch (clipErr: any) {
+            console.error('[Clipboard fallback] Failed to write image:', clipErr);
+            downloadSimCard();
+          } finally {
+            setCopyingCard(false);
+          }
+        }, 'image/png');
+      } catch (fallbackErr: any) {
+        console.error('[Canvas] Fallback Simulator PNG copy failed:', fallbackErr);
+        alert('Failed to copy card, calf!');
+        setCopyingCard(false);
+      } finally {
+        setCardAvatarUrl(avatarUrl);
+      }
     }
   };
 
@@ -478,9 +621,11 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
                 <img
-                  src={avatarUrl}
+                  src={cardAvatarUrl}
                   className="w-full h-full object-cover"
                   alt="logo"
+                  crossOrigin="anonymous"
+                  referrerPolicy="no-referrer"
                   onError={handleAvatarError}
                 />
               </div>
@@ -547,9 +692,11 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
               <img
-                src={avatarUrl}
+                src={cardAvatarUrl}
                 className="w-full h-full object-cover"
                 alt="logo"
+                crossOrigin="anonymous"
+                referrerPolicy="no-referrer"
                 onError={handleAvatarError}
               />
             </div>
@@ -1185,7 +1332,7 @@ export default function Home() {
                 <details className="group/item">
                   <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
                     <span>7. How can I join the community?</span>
-                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                    <span className="transition-transform duration-300 group-open:item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
                     Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts on Bullpen, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
