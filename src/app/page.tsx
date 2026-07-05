@@ -605,7 +605,7 @@ export default function Home() {
       
       {/* ---------------- OFF-SCREEN IMAGE GENERATION CANVASES ---------------- */}
       {/* Scanner Card Canvas */}
-      {/* WARNING: only use brand-* theme colors or hex arbitrary values (text-[#...]) in this element — default Tailwind palette classes compile to oklch() and will break html2canvas image export. */}
+      {/* WARNING: inside this element, only use literal hex/rgba values (bg-[#...], text-[rgba(...)]) — do NOT use default Tailwind palette classes OR /opacity modifier syntax (e.g. bg-black/60, text-gray-400). Tailwind v4 compiles both to oklch()/color-mix(), which html2canvas cannot parse and will silently break PNG/clipboard export. */}
       {balanceData && (
         <div
           id="allocation-card"
@@ -616,9 +616,9 @@ export default function Home() {
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
             alt="bull bg"
           />
-          <div className="absolute inset-0 bg-black/80 z-10" />
+          <div className="absolute inset-0 bg-[rgba(0,0,0,0.8)] z-10" />
 
-          <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-20">
+          <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
                 <img
@@ -649,7 +649,7 @@ export default function Home() {
               {balanceData.tier}
             </div>
 
-            <div className="bg-black/60 border border-white/10 py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
+            <div className="bg-[rgba(0,0,0,0.6)] border border-[rgba(255,255,255,0.1)] py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
               <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
@@ -662,7 +662,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
+          <div className="flex justify-between items-end border-t border-[rgba(255,255,255,0.1)] pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
             <div className="flex flex-col gap-0.5">
               <span>User: {balanceData.xHandle ? `@${balanceData.xHandle}` : 'Anon Calf'}</span>
               <span className="text-[8px] text-[#4b5563] font-mono">
@@ -678,7 +678,7 @@ export default function Home() {
       )}
 
       {/* Simulator Card Canvas */}
-      {/* WARNING: only use brand-* theme colors or hex arbitrary values (text-[#...]) in this element — default Tailwind palette classes compile to oklch() and will break html2canvas image export. */}
+      {/* WARNING: inside this element, only use literal hex/rgba values (bg-[#...], text-[rgba(...)]) — do NOT use default Tailwind palette classes OR /opacity modifier syntax (e.g. bg-black/60, text-gray-400). Tailwind v4 compiles both to oklch()/color-mix(), which html2canvas cannot parse and will silently break PNG/clipboard export. */}
       <div
         id="simulator-card"
         className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
@@ -688,9 +688,9 @@ export default function Home() {
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
           alt="bull bg"
         />
-        <div className="absolute inset-0 bg-black/85 z-10" />
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.85)] z-10" />
 
-        <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-20">
+        <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
               <img
@@ -721,7 +721,7 @@ export default function Home() {
             {simAllocation.toLocaleString()} $ANSEM
           </div>
 
-          <div className="bg-black/60 border border-white/10 py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[260px]">
+          <div className="bg-[rgba(0,0,0,0.6)] border border-[rgba(255,255,255,0.1)] py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[260px]">
             <span className="text-[9px] text-[#9ca3af] font-bold uppercase tracking-wider block">
               Projected Valuation (at {formatMarketCap(selectedMarketCap)} MC)
             </span>
@@ -731,7 +731,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
+        <div className="flex justify-between items-end border-t border-[rgba(255,255,255,0.1)] pt-4 text-[10px] text-[#6b7280] font-bold relative z-20">
           <div className="flex flex-col gap-0.5">
             <span>User: {xInput.trim() ? `@${xInput.trim().replace(/^@/, '')}` : 'Anon Calf'}</span>
             <span className="text-[8px] text-[#4b5563] font-mono">
