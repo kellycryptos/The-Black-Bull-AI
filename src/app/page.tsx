@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   ShieldCheck,
   Download,
+  Copy,
 } from 'lucide-react';
 
 interface PriceData {
@@ -57,8 +58,9 @@ export default function Home() {
   const [checkerLoading, setCheckerLoading] = useState(false);
   const [checkerError, setCheckerError] = useState<string | null>(null);
 
-  // Card Generation State
+  // Card Generation States
   const [generatingCard, setGeneratingCard] = useState(false);
+  const [copyingCard, setCopyingCard] = useState(false);
 
   // Chat State
   const [chatMessages, setChatMessages] = useState<Message[]>([
@@ -191,8 +193,52 @@ export default function Home() {
       downloadLink.click();
     } catch (err) {
       console.error('[Canvas] Failed to capture card:', err);
+      alert('Failed to generate PNG image card, calf!');
     } finally {
       setGeneratingCard(false);
+    }
+  };
+
+  // Copy Image to Clipboard
+  const copyShareCard = async () => {
+    const cardElement = document.getElementById('share-card-canvas-source');
+    if (!cardElement) return;
+
+    setCopyingCard(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const canvas = await html2canvas(cardElement, {
+        scale: 2, // High DPI capture
+        backgroundColor: '#000000',
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      });
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert('Failed to generate image blob, calf!');
+          setCopyingCard(false);
+          return;
+        }
+        try {
+          const item = new ClipboardItem({ 'image/png': blob });
+          await navigator.clipboard.write([item]);
+          alert('📋 Card image copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
+        } catch (clipErr: any) {
+          console.error('[Clipboard] Failed to write image:', clipErr);
+          // If browser restricts write, fallback to download
+          alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
+          downloadShareCard();
+        } finally {
+          setCopyingCard(false);
+        }
+      }, 'image/png');
+    } catch (err) {
+      console.error('[Canvas] Failed to copy card:', err);
+      alert('Failed to copy card to clipboard.');
+      setCopyingCard(false);
     }
   };
 
@@ -284,21 +330,23 @@ export default function Home() {
   return (
     <div className="flex-1 w-full trench-grid bg-brand-black flex flex-col justify-between py-6 px-4 sm:px-8 max-w-7xl mx-auto relative">
       
-      {/* Hidden container designed strictly for html2canvas generation (fixed 600x350 box) */}
+      {/* Target container designed for html2canvas generation (fixed 600x350 box behind everything) */}
       {balanceData && (
         <div
           id="share-card-canvas-source"
-          className="absolute left-[-9999px] top-[-9999px] w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans relative overflow-hidden"
-          style={{
-            backgroundImage: 'radial-gradient(circle at center, #050d08 0%, #000000 100%)',
-          }}
+          className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
         >
-          {/* Ambient Card Glow elements */}
-          <div className="absolute top-0 right-0 w-44 h-44 bg-brand-green/15 blur-3xl rounded-full" />
-          <div className="absolute bottom-0 left-0 w-44 h-44 bg-brand-gold/10 blur-3xl rounded-full" />
+          {/* The Bull Logo as background image */}
+          <img
+            src="/black-bull-logo.jpg"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+            alt="bull bg"
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/80 z-10" />
 
-          {/* Card Header */}
-          <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-10">
+          {/* Card Content wrapper (relative z-20 to stack above background and overlay) */}
+          <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-20">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
                 <img
@@ -318,8 +366,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Card Body */}
-          <div className="flex-1 flex flex-col justify-center gap-3 py-4 text-center relative z-10">
+          <div className="flex-1 flex flex-col justify-center gap-3 py-4 text-center relative z-20">
             <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
               Trench Classification
             </div>
@@ -327,7 +374,7 @@ export default function Home() {
               {balanceData.tier}
             </div>
 
-            <div className="bg-white/[0.03] border border-white/10 py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
+            <div className="bg-black/60 border border-white/10 py-3 px-6 rounded-xl inline-block mx-auto min-w-[240px]">
               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
@@ -340,8 +387,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Card Footer */}
-          <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-gray-500 font-bold relative z-10">
+          <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-gray-500 font-bold relative z-20">
             <div className="flex flex-col gap-0.5">
               <span>User: {balanceData.xHandle ? `@${balanceData.xHandle}` : 'Anon Calf'}</span>
               <span className="text-[8px] text-gray-600 font-mono">
@@ -584,23 +630,32 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-3 mt-1">
                   <button
                     onClick={downloadShareCard}
-                    disabled={generatingCard}
+                    disabled={generatingCard || copyingCard}
                     className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
                   >
                     <Download className="w-4 h-4 text-brand-green" />
                     {generatingCard ? 'Capturing...' : 'Download Card'}
                   </button>
                   <button
-                    onClick={shareToX}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer shadow-md shadow-blue-600/10"
+                    onClick={copyShareCard}
+                    disabled={generatingCard || copyingCard}
+                    className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
                   >
-                    <Twitter className="w-4 h-4 fill-current" />
-                    Share to X
+                    <Copy className="w-4 h-4 text-brand-green" />
+                    {copyingCard ? 'Copying...' : 'Copy Image'}
                   </button>
                 </div>
+
+                <button
+                  onClick={shareToX}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer shadow-md shadow-blue-600/10"
+                >
+                  <Twitter className="w-4 h-4 fill-current" />
+                  Post to X (Twitter)
+                </button>
                 
                 <p className="text-[10px] text-center text-gray-500 font-semibold leading-relaxed">
-                  💡 Tip: Download the card, then upload it in the X window to show off your rank!
+                  💡 Tip: Use <b>Copy Image</b> to paste directly into your X post, or download the image card!
                 </p>
 
                 <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-bold justify-end border-t border-white/5 pt-2">
@@ -800,7 +855,7 @@ export default function Home() {
           </a>
           <span className="hidden sm:inline text-gray-700">|</span>
           <span className="text-[10px] text-gray-600 font-mono">
-            Mint: 9cRC...PvTGpump
+            Mint Address: 9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump
           </span>
         </div>
       </footer>
