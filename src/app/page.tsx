@@ -244,31 +244,57 @@ export default function Home() {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
+      console.log('[Card Debug] Element outerHTML length:', cardElement.outerHTML.length);
+      const rect = cardElement.getBoundingClientRect();
+      console.log('[Card Debug] Element bounding box:', { width: rect.width, height: rect.height, top: rect.top, left: rect.left });
+
       const canvas = await html2canvas(cardElement, {
         scale: 2,
         backgroundColor: '#000000',
         useCORS: true,
         allowTaint: false,
-        logging: false,
+        logging: true, // Verbose logging enabled for debugging
       });
 
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('Blob generation returned null');
       return blob;
-    } catch (err) {
-      console.warn('[Canvas] Standard capture failed, attempting fallback:', err);
+    } catch (err: any) {
+      console.error('[CAPTURE ERROR] Standard capture failed:', {
+        name: err?.name,
+        message: err?.message,
+        stack: err?.stack,
+        raw: err
+      });
+      
+      console.log('[Card Debug] Standard capture failed, attempting fallback to local logo...');
       setCardAvatarUrl('/black-bull-logo.jpg');
       await new Promise((resolve) => setTimeout(resolve, 150));
-      const canvas = await html2canvas(cardElement, {
-        scale: 2,
-        backgroundColor: '#000000',
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      });
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) throw new Error('Fallback blob generation returned null');
-      return blob;
+      
+      try {
+        console.log('[Card Debug] Fallback Element outerHTML length:', cardElement.outerHTML.length);
+        const fallbackRect = cardElement.getBoundingClientRect();
+        console.log('[Card Debug] Fallback Element bounding box:', { width: fallbackRect.width, height: fallbackRect.height, top: fallbackRect.top, left: fallbackRect.left });
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 2,
+          backgroundColor: '#000000',
+          useCORS: true,
+          allowTaint: false,
+          logging: true, // Verbose logging enabled for debugging
+        });
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error('Fallback blob generation returned null');
+        return blob;
+      } catch (fallbackErr: any) {
+        console.error('[CAPTURE ERROR] Fallback capture failed:', {
+          name: fallbackErr?.name,
+          message: fallbackErr?.message,
+          stack: fallbackErr?.stack,
+          raw: fallbackErr
+        });
+        throw fallbackErr;
+      }
     } finally {
       setCardAvatarUrl(originalAvatar);
     }
@@ -515,7 +541,7 @@ export default function Home() {
 
           <div className="flex-1 flex flex-col justify-center gap-2.5 py-3 text-center relative z-20">
             {/* Centered User Avatar */}
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative" style={{ boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}>
               <img
                 src={cardAvatarUrl}
                 className="w-full h-full object-cover"
@@ -587,7 +613,7 @@ export default function Home() {
 
         <div className="flex-1 flex flex-col justify-center gap-2 py-3 text-center relative z-20">
           {/* Centered User Avatar */}
-          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative shadow-lg shadow-[rgba(0,255,163,0.2)]">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#10b981] mx-auto relative" style={{ boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}>
             <img
               src={cardAvatarUrl}
               className="w-full h-full object-cover"
