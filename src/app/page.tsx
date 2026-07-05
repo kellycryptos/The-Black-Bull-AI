@@ -616,7 +616,7 @@ export default function Home() {
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
             alt="bull bg"
           />
-          <div className="absolute inset-0 bg-[rgba(0,0,0,0.8)] z-10" />
+          <div className="absolute inset-0 bg-[rgba(0,0,0,0.7)] z-10" />
 
           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
             <div className="flex items-center gap-3">
@@ -688,7 +688,7 @@ export default function Home() {
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
           alt="bull bg"
         />
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.85)] z-10" />
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.8)] z-10" />
 
         <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
           <div className="flex items-center gap-3">
