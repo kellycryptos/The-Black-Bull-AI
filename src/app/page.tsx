@@ -225,29 +225,74 @@ export default function Home() {
 
   // Helper to capture a card element to a PNG blob with pre-flight check and fallback
   const captureCardToBlob = async (cardElement: HTMLElement): Promise<Blob> => {
-    const originalAvatar = cardAvatarUrl;
+    const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+    const targetSrc = cardAvatarUrl;
+    
+    console.log('[Avatar Debug] targetSrc:', targetSrc, '| initial DOM src:', avatarImgEl?.src);
+
+    if (avatarImgEl && targetSrc) {
+      // 1. Force the target URL directly onto the DOM element to bypass React render batching
+      if (avatarImgEl.getAttribute('src') !== targetSrc) {
+        avatarImgEl.src = targetSrc;
+      }
+
+      // 2. Synchronously await the load event of this specific DOM element
+      try {
+        await new Promise<void>((resolve, reject) => {
+          if (avatarImgEl.complete && avatarImgEl.naturalWidth > 0) {
+            console.log('[Avatar Debug] DOM image already complete and verified.');
+            return resolve();
+          }
+          console.log('[Avatar Debug] Waiting for onload/onerror on actual DOM image...');
+          avatarImgEl.onload = () => {
+            console.log('[Avatar Debug] DOM image loaded successfully.');
+            resolve();
+          };
+          avatarImgEl.onerror = (e) => {
+            console.warn('[Avatar Debug] DOM image load failed:', e);
+            reject(new Error('DOM image load failed'));
+          };
+          // 2.5s safety timeout
+          setTimeout(() => {
+            console.warn('[Avatar Debug] Safety timeout reached on DOM image load.');
+            resolve();
+          }, 2500);
+        });
+      } catch (err) {
+        console.warn('[Avatar Debug] Load promise failed, using fallback image in DOM:', err);
+        avatarImgEl.src = '/black-bull-logo.jpg';
+        await new Promise<void>((resolve) => {
+          if (avatarImgEl.complete && avatarImgEl.naturalWidth > 0) return resolve();
+          avatarImgEl.onload = () => resolve();
+          avatarImgEl.onerror = () => resolve();
+          setTimeout(resolve, 1000);
+        });
+      }
+    }
+
+    // 3. Final pre-flight verification on DOM element
+    if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+      console.log('[Avatar Debug] Final validation failed (naturalWidth <= 0), forcing local logo fallback...');
+      avatarImgEl.src = '/black-bull-logo.jpg';
+      await new Promise<void>((resolve) => {
+        if (avatarImgEl.complete) return resolve();
+        avatarImgEl.onload = () => resolve();
+        avatarImgEl.onerror = () => resolve();
+        setTimeout(resolve, 1000);
+      });
+    }
+
+    console.log('[Avatar Debug] Final state before capture:', {
+      src: avatarImgEl?.src,
+      complete: avatarImgEl?.complete,
+      naturalWidth: avatarImgEl?.naturalWidth
+    });
+
+    console.log('[Card Debug] Element outerHTML length:', cardElement.outerHTML.length);
+    const rect = cardElement.getBoundingClientRect();
+    console.log('[Card Debug] Element bounding box:', { width: rect.width, height: rect.height, top: rect.top, left: rect.left });
+
     try {
-      if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
-        try {
-          await preloadImage(cardAvatarUrl);
-        } catch (e) {
-          console.warn('[Canvas] Preload image failed:', e);
-        }
-      }
-
-      // Pre-flight avatar check — swap to local logo if image didn't actually load
-      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
-      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
-      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
-        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
-        setCardAvatarUrl('/black-bull-logo.jpg');
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      console.log('[Card Debug] Element outerHTML length:', cardElement.outerHTML.length);
-      const rect = cardElement.getBoundingClientRect();
-      console.log('[Card Debug] Element bounding box:', { width: rect.width, height: rect.height, top: rect.top, left: rect.left });
-
       const canvas = await html2canvas(cardElement, {
         scale: 2,
         backgroundColor: '#000000',
@@ -268,8 +313,15 @@ export default function Home() {
       });
       
       console.log('[Card Debug] Standard capture failed, attempting fallback to local logo...');
-      setCardAvatarUrl('/black-bull-logo.jpg');
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      if (avatarImgEl) {
+        avatarImgEl.src = '/black-bull-logo.jpg';
+        await new Promise<void>((resolve) => {
+          if (avatarImgEl.complete) return resolve();
+          avatarImgEl.onload = () => resolve();
+          avatarImgEl.onerror = () => resolve();
+          setTimeout(resolve, 1000);
+        });
+      }
       
       try {
         console.log('[Card Debug] Fallback Element outerHTML length:', cardElement.outerHTML.length);
@@ -296,7 +348,10 @@ export default function Home() {
         throw fallbackErr;
       }
     } finally {
-      setCardAvatarUrl(originalAvatar);
+      // Revert the DOM element src back to the React state cardAvatarUrl to preserve hydration/virtual DOM alignment
+      if (avatarImgEl) {
+        avatarImgEl.src = cardAvatarUrl;
+      }
     }
   };
 
