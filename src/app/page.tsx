@@ -43,8 +43,25 @@ interface Message {
   content: string;
 }
 
+// Market Cap milestones for the simulator slider
+const MARKET_CAP_MILESTONES = [
+  10000000,    // $10M
+  25000000,    // $25M
+  50000000,    // $50M
+  100000000,   // $100M
+  250000000,   // $250M
+  500000000,   // $500M
+  1000000000,  // $1B
+  2500000000,  // $2.5B
+  5000000000,  // $5B
+  10000000000, // $10B
+];
+
 export default function Home() {
-  // Input fields
+  // Tab Switcher state
+  const [activeTab, setActiveTab] = useState<'scanner' | 'simulator'>('scanner');
+
+  // Input fields (Scanner)
   const [walletInput, setWalletInput] = useState('');
   const [xInput, setXInput] = useState('');
 
@@ -53,13 +70,19 @@ export default function Home() {
   const [priceLoading, setPriceLoading] = useState(false);
   const [priceError, setPriceError] = useState<string | null>(null);
 
-  // Checker State
+  // Checker State (Scanner)
   const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
   const [checkerLoading, setCheckerLoading] = useState(false);
   const [checkerError, setCheckerError] = useState<string | null>(null);
 
   // Dynamic Avatar State
   const [avatarUrl, setAvatarUrl] = useState('/black-bull-logo.jpg');
+
+  // Simulator Sliders State
+  const [simHoldings, setSimHoldings] = useState(50000);
+  const [simImpressions, setSimImpressions] = useState(100000);
+  const [simSupplyPct, setSimSupplyPct] = useState(10);
+  const [simCapIndex, setSimCapIndex] = useState(3); // Defaults to index 3 ($100M cap)
 
   // Card Generation States
   const [generatingCard, setGeneratingCard] = useState(false);
@@ -91,15 +114,16 @@ export default function Home() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatLoading]);
 
-  // 3. Resolve X profile picture when checked data updates
+  // 3. Resolve X profile picture when checked data or manual input updates
   useEffect(() => {
-    if (balanceData?.xHandle) {
-      const cleanHandle = balanceData.xHandle.trim().replace(/^@/, '');
+    const handle = activeTab === 'scanner' ? balanceData?.xHandle : xInput;
+    if (handle?.trim()) {
+      const cleanHandle = handle.trim().replace(/^@/, '');
       setAvatarUrl(`https://unavatar.io/twitter/${cleanHandle}`);
     } else {
       setAvatarUrl('/black-bull-logo.jpg');
     }
-  }, [balanceData]);
+  }, [balanceData, xInput, activeTab]);
 
   // Fetch token price function
   const fetchPrice = async () => {
@@ -128,7 +152,7 @@ export default function Home() {
     }
   };
 
-  // Run allocation check
+  // Run allocation check (Scanner)
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletInput.trim()) {
@@ -182,7 +206,7 @@ export default function Home() {
     }
   };
 
-  // HTML2Canvas Image download trigger
+  // HTML2Canvas Image download trigger for Scanner Card
   const downloadShareCard = async () => {
     const cardElement = document.getElementById('share-card-canvas-source');
     if (!cardElement) return;
@@ -212,7 +236,7 @@ export default function Home() {
     }
   };
 
-  // Copy Image to Clipboard
+  // Copy Image to Clipboard for Scanner Card
   const copyShareCard = async () => {
     const cardElement = document.getElementById('share-card-canvas-source');
     if (!cardElement) return;
@@ -241,7 +265,6 @@ export default function Home() {
           alert('📋 Card image copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
         } catch (clipErr: any) {
           console.error('[Clipboard] Failed to write image:', clipErr);
-          // If browser restricts write, fallback to download
           alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
           downloadShareCard();
         } finally {
@@ -255,7 +278,7 @@ export default function Home() {
     }
   };
 
-  // Open Twitter Web Intent
+  // Open Twitter Web Intent for Scanner results
   const shareToX = () => {
     if (!balanceData) return;
 
@@ -264,7 +287,98 @@ export default function Home() {
     window.open(twitterUrl, '_blank');
   };
 
-  // Send message helper
+  // --- SIMULATOR FUNCTIONS ---
+  const selectedMarketCap = MARKET_CAP_MILESTONES[simCapIndex];
+  const simTokenPrice = selectedMarketCap / 1000000000;
+  const simAllocation = Math.round((simHoldings * 0.15) + (simImpressions * 0.45) * (simSupplyPct / 10));
+  const simUsdValue = simAllocation * simTokenPrice;
+
+  const formatMarketCap = (val: number) => {
+    if (val >= 1000000000) return `$${(val / 1000000000).toFixed(1).replace(/\.0$/, '')}B`;
+    return `$${(val / 1000000).toFixed(0)}M`;
+  };
+
+  // HTML2Canvas Image download trigger for Simulator Card
+  const downloadSimCard = async () => {
+    const cardElement = document.getElementById('simulator-card-canvas-source');
+    if (!cardElement) return;
+
+    setGeneratingCard(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const canvas = await html2canvas(cardElement, {
+        scale: 2, // High DPI capture
+        backgroundColor: '#000000',
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `black-bull-simulation-${xInput.trim() || 'anon'}.png`;
+      downloadLink.href = imgData;
+      downloadLink.click();
+    } catch (err) {
+      console.error('[Canvas] Failed to capture simulator card:', err);
+      alert('Failed to generate PNG image card, calf!');
+    } finally {
+      setGeneratingCard(false);
+    }
+  };
+
+  // Copy Image to Clipboard for Simulator Card
+  const copySimCard = async () => {
+    const cardElement = document.getElementById('simulator-card-canvas-source');
+    if (!cardElement) return;
+
+    setCopyingCard(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const canvas = await html2canvas(cardElement, {
+        scale: 2, // High DPI capture
+        backgroundColor: '#000000',
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      });
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert('Failed to generate image blob, calf!');
+          setCopyingCard(false);
+          return;
+        }
+        try {
+          const item = new ClipboardItem({ 'image/png': blob });
+          await navigator.clipboard.write([item]);
+          alert('📋 Simulation card copied to clipboard! You can now paste (Ctrl+V) it directly into your X post.');
+        } catch (clipErr: any) {
+          console.error('[Clipboard] Failed to write image:', clipErr);
+          alert('Direct clipboard write blocked by browser permissions! Downloading card instead...');
+          downloadSimCard();
+        } finally {
+          setCopyingCard(false);
+        }
+      }, 'image/png');
+    } catch (err) {
+      console.error('[Canvas] Failed to copy simulator card:', err);
+      alert('Failed to copy card to clipboard.');
+      setCopyingCard(false);
+    }
+  };
+
+  // Open Twitter Web Intent for Simulator results
+  const shareSimToX = () => {
+    const formatMcVal = formatMarketCap(selectedMarketCap);
+    const baseText = `Simulated my potential $ANSEM rewards on The Black Bull AI Oracle! 🐂🔥\n\nEstimated Allocation: ${simAllocation.toLocaleString()} $ANSEM\nProjected USD Worth: $${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} (at ${formatMcVal} MC)\n\nClaim here (Ref: Kellycryptos):\nhttps://app.bullpen.fi/claim?ref=Kellycryptos\n\nCheck yours here: ${window.location.origin}\n\n$ANSEM to the moon! 🚀`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(baseText)}`;
+    window.open(twitterUrl, '_blank');
+  };
+
+  // --- COMMON CHAT HELPERS ---
   const handleSendMessage = async (textToSend?: string) => {
     const input = textToSend || chatInput;
     if (!input.trim() || chatLoading) return;
@@ -320,7 +434,6 @@ export default function Home() {
     }
   };
 
-  // Quick Action triggers
   const triggerQuickAction = (actionType: 'price' | 'lore' | 'roast' | 'motivate') => {
     let prompt = '';
     switch (actionType) {
@@ -340,7 +453,6 @@ export default function Home() {
     handleSendMessage(prompt);
   };
 
-  // Fallback for avatar image loading errors
   const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = '/black-bull-logo.jpg';
   };
@@ -348,22 +460,20 @@ export default function Home() {
   return (
     <div className="flex-1 w-full trench-grid bg-brand-black flex flex-col justify-between py-6 px-4 sm:px-8 max-w-7xl mx-auto relative">
       
-      {/* Target container designed for html2canvas generation (fixed 600x350 box behind everything) */}
+      {/* ---------------- OFF-SCREEN IMAGE GENERATION CANVASES ---------------- */}
+      {/* Scanner Card Canvas */}
       {balanceData && (
         <div
           id="share-card-canvas-source"
           className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
         >
-          {/* The Bull Logo as background image */}
           <img
             src="/black-bull-logo.jpg"
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
             alt="bull bg"
           />
-          {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/80 z-10" />
 
-          {/* Card Content wrapper (relative z-20 to stack above background and overlay) */}
           <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-20">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
@@ -421,7 +531,72 @@ export default function Home() {
         </div>
       )}
 
-      {/* 1. Header Hero & Price Banner */}
+      {/* Simulator Card Canvas */}
+      <div
+        id="simulator-card-canvas-source"
+        className="fixed right-0 bottom-0 w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans overflow-hidden z-[-50] opacity-[0.01] pointer-events-none"
+      >
+        <img
+          src="/black-bull-logo.jpg"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          alt="bull bg"
+        />
+        <div className="absolute inset-0 bg-black/85 z-10" />
+
+        <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-20">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
+              <img
+                src={avatarUrl}
+                className="w-full h-full object-cover"
+                alt="logo"
+                onError={handleAvatarError}
+              />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
+              <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SIMULATION ORACLE</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-base font-black text-brand-gold">$ANSEM</span>
+            <p className="text-[7px] text-gray-500 font-bold uppercase tracking-widest">Mint: 9cRC...TGpump</p>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center gap-2 py-4 text-center relative z-20">
+          <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
+            Speculative Bull Allocation
+          </div>
+          <div className="text-2xl font-black text-brand-green font-mono tracking-tight glow-text-green leading-none">
+            {simAllocation.toLocaleString()} $ANSEM
+          </div>
+
+          <div className="bg-black/60 border border-white/10 py-2.5 px-6 rounded-xl inline-block mx-auto min-w-[260px]">
+            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
+              Projected Valuation (at {formatMarketCap(selectedMarketCap)} MC)
+            </span>
+            <span className="text-2xl font-black text-brand-gold font-mono block my-0.5">
+              ${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD
+            </span>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-end border-t border-white/10 pt-4 text-[10px] text-gray-500 font-bold relative z-20">
+          <div className="flex flex-col gap-0.5">
+            <span>User: {xInput.trim() ? `@${xInput.trim().replace(/^@/, '')}` : 'Anon Calf'}</span>
+            <span className="text-[8px] text-gray-600 font-mono">
+              Holdings: {simHoldings.toLocaleString()} $ANSEM | Impressions: {simImpressions.toLocaleString()}
+            </span>
+          </div>
+          <div className="text-right flex flex-col gap-0.5">
+            <span className="text-brand-green">Built by @kellycryptos</span>
+            <span className="text-[8px] text-gray-600 font-mono">the-black-bull-ai.vercel.app</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------------- 1. HEADER HERO ---------------- */}
       <header className="w-full mb-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-5 rounded-2xl green-glow-border">
           <div className="flex items-center gap-4">
@@ -489,19 +664,20 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 2. Main content area: Checker + Chat */}
+      {/* ---------------- 2. MAIN WORKSPACE ---------------- */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        {/* LEFT COLUMN: Allocation Checker, Onboarding Guide & FAQ */}
+        {/* LEFT COLUMN: Allocation Checker / Simulator Card, Onboarding Guide & FAQ */}
         <section className="lg:col-span-5 flex flex-col gap-6">
-          {/* Main Simulator Card */}
+          
+          {/* Main Simulator/Scanner Glass Panel */}
           <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 green-glow-border relative overflow-hidden justify-start">
             {/* Ambient Background Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 blur-3xl rounded-full -z-10" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-gold/5 blur-3xl rounded-full -z-10" />
 
-            {/* Banner logo inside card */}
-            <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-brand-green/30 green-glow-border mb-1">
+            {/* Banner logo */}
+            <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-brand-green/30 green-glow-border mb-1">
               <img
                 src="/black-bull-logo.jpg"
                 alt="Black Bull Official Banner"
@@ -515,181 +691,374 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-              <Coins className="w-5 h-5 text-brand-green" />
-              <h2 className="text-lg font-bold text-white tracking-wide uppercase">
-                Airdrop Simulator
-              </h2>
+            {/* Navigation Tabs */}
+            <div className="flex bg-black/40 border border-white/5 p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setActiveTab('scanner')}
+                className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                  activeTab === 'scanner'
+                    ? 'bg-brand-green text-black font-extrabold shadow-md shadow-brand-green/10'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Airdrop Scanner
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('simulator')}
+                className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                  activeTab === 'simulator'
+                    ? 'bg-brand-green text-black font-extrabold shadow-md shadow-brand-green/10'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Bull Simulator
+              </button>
             </div>
 
-            {/* Input Form */}
-            <form onSubmit={handleCheck} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Twitter className="w-3.5 h-3.5 text-blue-400" /> X Handle (Optional)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-sm">
-                    @
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="kellycryptos"
-                    value={xInput}
-                    onChange={(e) => setXInput(e.target.value)}
+            {/* TAB 1: Scanner View */}
+            {activeTab === 'scanner' && (
+              <div className="flex flex-col gap-4 animate-fadeIn">
+                <form onSubmit={handleCheck} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Twitter className="w-3.5 h-3.5 text-blue-400" /> X Handle (Optional)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-sm">
+                        @
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="kellycryptos"
+                        value={xInput}
+                        onChange={(e) => setXInput(e.target.value)}
+                        disabled={checkerLoading}
+                        className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl pl-8 pr-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Wallet className="w-3.5 h-3.5 text-brand-green" /> Solana Wallet Address
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM... (or yours)"
+                      value={walletInput}
+                      onChange={(e) => setWalletInput(e.target.value)}
+                      disabled={checkerLoading}
+                      className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
                     disabled={checkerLoading}
-                    className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl pl-8 pr-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
-                  />
-                </div>
-              </div>
+                    className="w-full bg-brand-green hover:bg-brand-green-dark text-black font-extrabold uppercase py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-green/10 hover:shadow-brand-green/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm tracking-wider"
+                  >
+                    {checkerLoading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Scanning the Trenches...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 fill-current" />
+                        Check My Allocation
+                      </>
+                    )}
+                  </button>
+                </form>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Wallet className="w-3.5 h-3.5 text-brand-green" /> Solana Wallet Address
-                </label>
-                <input
-                  type="text"
-                  placeholder="9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM... (or yours)"
-                  value={walletInput}
-                  onChange={(e) => setWalletInput(e.target.value)}
-                  disabled={checkerLoading}
-                  className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={checkerLoading}
-                className="w-full bg-brand-green hover:bg-brand-green-dark text-black font-extrabold uppercase py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-green/10 hover:shadow-brand-green/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm tracking-wider"
-              >
-                {checkerLoading ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Scanning the Trenches...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4 fill-current" />
-                    Check My Allocation
-                  </>
+                {checkerError && (
+                  <div className="bg-brand-red/10 border border-brand-red/30 p-4 rounded-xl flex items-start gap-3 animate-shake">
+                    <AlertTriangle className="w-5 h-5 text-brand-red shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-bold text-brand-red uppercase tracking-wider">
+                        Scan Failed
+                      </span>
+                      <p className="text-xs text-gray-300 leading-relaxed font-semibold">
+                        {checkerError}
+                      </p>
+                    </div>
+                  </div>
                 )}
-              </button>
-            </form>
 
-            {/* Error Message Panel */}
-            {checkerError && (
-              <div className="bg-brand-red/10 border border-brand-red/30 p-4 rounded-xl flex items-start gap-3 animate-shake">
-                <AlertTriangle className="w-5 h-5 text-brand-red shrink-0 mt-0.5" />
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs font-bold text-brand-red uppercase tracking-wider">
-                    Scan Failed
-                  </span>
-                  <p className="text-xs text-gray-300 leading-relaxed font-semibold">
-                    {checkerError}
-                  </p>
-                </div>
+                {/* Scanner Result details */}
+                {balanceData && (
+                  <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 animate-fadeIn">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-green relative">
+                          <img
+                            src={avatarUrl}
+                            className="w-full h-full object-cover"
+                            alt="user avatar"
+                            onError={handleAvatarError}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                            Detected Weight
+                          </span>
+                          <span className="text-sm font-mono font-bold text-white">
+                            {balanceData.formattedBalance} $ANSEM
+                          </span>
+                        </div>
+                      </div>
+                      <div className="bg-brand-green/10 border border-brand-green/30 text-brand-green font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
+                        {balanceData.tier}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center py-2 bg-black/30 rounded-xl border border-white/5 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 bg-brand-green text-black font-extrabold text-[8px] uppercase px-1.5 py-0.5 rounded-br-lg tracking-wider">
+                        Simulated Allocation
+                      </div>
+                      <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">
+                        Airdrop Share
+                      </span>
+                      <span className="text-3xl font-black text-brand-green font-mono tracking-tight glow-text-green">
+                        {balanceData.allocationAmount.toLocaleString()}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
+                        $ANSEM tokens
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-gray-300 leading-relaxed bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg font-medium italic">
+                      "{balanceData.message}"
+                    </p>
+
+                    <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
+                      <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
+                        Claim Real $ANSEM Rewards
+                      </span>
+                      <p className="text-xs text-gray-300 font-semibold leading-relaxed">
+                        Want to claim $ANSEM airdrop / rewards? Use my Bullpen referral:
+                      </p>
+                      <a
+                        href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
+                      >
+                        🚀 Claim via Bullpen
+                      </a>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-1">
+                      <button
+                        onClick={downloadShareCard}
+                        disabled={generatingCard || copyingCard}
+                        className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
+                      >
+                        <Download className="w-4 h-4 text-brand-green" />
+                        {generatingCard ? 'Capturing...' : 'Download Card'}
+                      </button>
+                      <button
+                        onClick={copyShareCard}
+                        disabled={generatingCard || copyingCard}
+                        className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
+                      >
+                        <Copy className="w-4 h-4 text-brand-green" />
+                        {copyingCard ? 'Copying...' : 'Copy Image'}
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={shareToX}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer shadow-md shadow-blue-600/10"
+                    >
+                      <Twitter className="w-4 h-4 fill-current" />
+                      Post to X (Twitter)
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Allocation Results Panel */}
-            {balanceData && (
-              <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 animate-fadeIn">
-                <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border border-brand-green relative">
-                      <img
-                        src={avatarUrl}
-                        className="w-full h-full object-cover"
-                        alt="user avatar"
-                        onError={handleAvatarError}
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-                        Detected Weight
-                      </span>
-                      <span className="text-sm font-mono font-bold text-white">
-                        {balanceData.formattedBalance} $ANSEM
-                      </span>
-                    </div>
-                  </div>
-                  <div className="bg-brand-green/10 border border-brand-green/30 text-brand-green font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
-                    {balanceData.tier}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center py-2 bg-black/30 rounded-xl border border-white/5 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 bg-brand-green text-black font-extrabold text-[8px] uppercase px-1.5 py-0.5 rounded-br-lg tracking-wider">
-                    Simulated Allocation
-                  </div>
-                  <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">
-                    Airdrop Share
-                  </span>
-                  <span className="text-3xl font-black text-brand-green font-mono tracking-tight glow-text-green">
-                    {balanceData.allocationAmount.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
-                    $ANSEM tokens
-                  </span>
-                </div>
-
-                <p className="text-xs text-gray-300 leading-relaxed bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg font-medium italic">
-                  "{balanceData.message}"
-                </p>
-
-                {/* Bullpen Referral CTA */}
-                <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
-                  <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
-                    Claim Real $ANSEM Rewards
-                  </span>
-                  <p className="text-xs text-gray-300 font-semibold leading-relaxed">
-                    Want to claim $ANSEM airdrop / rewards? Use my Bullpen referral:
+            {/* TAB 2: Speculative Simulator View */}
+            {activeTab === 'simulator' && (
+              <div className="flex flex-col gap-4 animate-fadeIn">
+                <div className="bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg">
+                  <p className="text-xs text-gray-300 leading-relaxed font-semibold">
+                    Simulate your potential $ANSEM rewards based on your holdings, posting activity, and community allocation!
                   </p>
-                  <a
-                    href="https://app.bullpen.fi/claim?ref=Kellycryptos"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
-                  >
-                    🚀 Claim via Bullpen
-                  </a>
                 </div>
 
-                {/* Viral Sharing Controls */}
-                <div className="grid grid-cols-2 gap-3 mt-1">
-                  <button
-                    onClick={downloadShareCard}
-                    disabled={generatingCard || copyingCard}
-                    className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
-                  >
-                    <Download className="w-4 h-4 text-brand-green" />
-                    {generatingCard ? 'Capturing...' : 'Download Card'}
-                  </button>
-                  <button
-                    onClick={copyShareCard}
-                    disabled={generatingCard || copyingCard}
-                    className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
-                  >
-                    <Copy className="w-4 h-4 text-brand-green" />
-                    {copyingCard ? 'Copying...' : 'Copy Image'}
-                  </button>
+                {/* Optional X username input to show on simulation card */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Twitter className="w-3 h-3 text-blue-400" /> Enter X Handle (for Simulation Card)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-xs">
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="kellycryptos"
+                      value={xInput}
+                      onChange={(e) => setXInput(e.target.value)}
+                      className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:outline-none rounded-xl pl-8 pr-4 py-2 text-xs text-white font-mono placeholder:text-gray-600 transition-all duration-300"
+                    />
+                  </div>
                 </div>
 
-                <button
-                  onClick={shareToX}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer shadow-md shadow-blue-600/10"
-                >
-                  <Twitter className="w-4 h-4 fill-current" />
-                  Post to X (Twitter)
-                </button>
-                
-                <p className="text-[10px] text-center text-gray-500 font-semibold leading-relaxed">
-                  💡 Tip: Use <b>Copy Image</b> to paste directly into your X post, or download the image card!
-                </p>
+                {/* Holdings Slider */}
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                    <span className="text-gray-400">Your $ANSEM Holdings</span>
+                    <span className="text-brand-green font-mono">{simHoldings.toLocaleString()}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1000000"
+                    step="5000"
+                    value={simHoldings}
+                    onChange={(e) => setSimHoldings(parseInt(e.target.value))}
+                    className="w-full accent-brand-green bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-500 font-bold font-mono">
+                    <span>0</span>
+                    <span>500K</span>
+                    <span>1M</span>
+                  </div>
+                </div>
 
-                <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-bold justify-end border-t border-white/5 pt-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                  Verified via Solana RPC
+                {/* Impressions Slider */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                    <span className="text-gray-400">X Impressions / Score</span>
+                    <span className="text-brand-green font-mono">{simImpressions.toLocaleString()}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="500000"
+                    step="10000"
+                    value={simImpressions}
+                    onChange={(e) => setSimImpressions(parseInt(e.target.value))}
+                    className="w-full accent-brand-green bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-500 font-bold font-mono">
+                    <span>0</span>
+                    <span>250K</span>
+                    <span>500K</span>
+                  </div>
+                </div>
+
+                {/* Supply Pct Slider */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                    <span className="text-gray-400">Supply Pct to Community</span>
+                    <span className="text-brand-green font-mono">{simSupplyPct}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="30"
+                    step="1"
+                    value={simSupplyPct}
+                    onChange={(e) => setSimSupplyPct(parseInt(e.target.value))}
+                    className="w-full accent-brand-green bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-500 font-bold font-mono">
+                    <span>5%</span>
+                    <span>17.5%</span>
+                    <span>30%</span>
+                  </div>
+                </div>
+
+                {/* Market Cap Slider */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                    <span className="text-gray-400">Projected Market Cap</span>
+                    <span className="text-brand-gold font-mono">{formatMarketCap(selectedMarketCap)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max={MARKET_CAP_MILESTONES.length - 1}
+                    step="1"
+                    value={simCapIndex}
+                    onChange={(e) => setSimCapIndex(parseInt(e.target.value))}
+                    className="w-full accent-brand-green bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-500 font-bold font-mono">
+                    <span>$10M</span>
+                    <span>$500M</span>
+                    <span>$10B</span>
+                  </div>
+                </div>
+
+                {/* Live Simulation Results Panel */}
+                <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 mt-2">
+                  <div className="flex flex-col items-center py-2 bg-black/30 rounded-xl border border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 bg-brand-green text-black font-extrabold text-[8px] uppercase px-1.5 py-0.5 rounded-br-lg tracking-wider">
+                      Simulation Result
+                    </div>
+                    <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">
+                      Simulated Allocation
+                    </span>
+                    <span className="text-2xl font-black text-brand-green font-mono tracking-tight glow-text-green">
+                      {simAllocation.toLocaleString()} $ANSEM
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
+                      Projected Value: <span className="text-brand-gold font-black">${simUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} USD</span>
+                    </span>
+                  </div>
+
+                  {/* Referral CTA */}
+                  <div className="bg-brand-green/10 border border-brand-green/20 p-4 rounded-xl flex flex-col gap-2">
+                    <span className="text-[9px] font-black text-brand-green uppercase tracking-widest block">
+                      Secure Your Allocation
+                    </span>
+                    <p className="text-xs text-gray-300 font-semibold leading-relaxed">
+                      Make this simulated allocation a reality! Join the Bullpen claim list:
+                    </p>
+                    <a
+                      href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-brand-green hover:bg-brand-green-dark text-black text-center font-black uppercase py-2.5 px-4 rounded-xl text-[10px] tracking-widest transition-all duration-300 hover:scale-[1.02] shadow-md shadow-brand-green/10"
+                    >
+                      🚀 Claim via Bullpen
+                    </a>
+                  </div>
+
+                  {/* Canvas Buttons */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={downloadSimCard}
+                      disabled={generatingCard || copyingCard}
+                      className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
+                    >
+                      <Download className="w-4 h-4 text-brand-green" />
+                      {generatingCard ? 'Capturing...' : 'Download Card'}
+                    </button>
+                    <button
+                      onClick={copySimCard}
+                      disabled={generatingCard || copyingCard}
+                      className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
+                    >
+                      <Copy className="w-4 h-4 text-brand-green" />
+                      {copyingCard ? 'Copying...' : 'Copy Image'}
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={shareSimToX}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer shadow-md shadow-blue-600/10"
+                  >
+                    <Twitter className="w-4 h-4 fill-current" />
+                    Post Simulation to X
+                  </button>
                 </div>
               </div>
             )}
@@ -832,7 +1201,7 @@ export default function Home() {
                 <details className="group/item">
                   <summary className="list-none flex items-center justify-between cursor-pointer font-bold text-xs text-gray-200 select-none">
                     <span>7. How can I join the community?</span>
-                    <span className="transition-transform duration-300 group-open/item:rotate-180 text-brand-green text-[10px]">▼</span>
+                    <span className="transition-transform duration-300 group-open:item:rotate-180 text-brand-green text-[10px]">▼</span>
                   </summary>
                   <p className="mt-2 text-xs text-gray-400 leading-relaxed">
                     Follow <a href="https://x.com/kellycryptos" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold">@kellycryptos</a> on X (Twitter), start creating bullposts on Bullpen, and join the active discussions online to learn, grow, and charge forward in the Solana ecosystem!
@@ -943,7 +1312,6 @@ export default function Home() {
                 placeholder="Talk to the Bull... 'Roast my bag, calf!'"
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                disabled={chatLoading}
                 className="flex-1 bg-black border border-white/10 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 transition-all duration-300"
               />
               <button
