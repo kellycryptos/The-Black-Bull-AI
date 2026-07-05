@@ -15,10 +15,8 @@ import {
   Skull,
   BookOpen,
   AlertTriangle,
-  ChevronRight,
   ShieldCheck,
   Download,
-  Share2,
 } from 'lucide-react';
 
 interface PriceData {
@@ -176,7 +174,6 @@ export default function Home() {
 
     setGeneratingCard(true);
     try {
-      // Small timeout to allow canvas-source rendering to settle
       await new Promise((resolve) => setTimeout(resolve, 150));
 
       const canvas = await html2canvas(cardElement, {
@@ -291,22 +288,28 @@ export default function Home() {
       {balanceData && (
         <div
           id="share-card-canvas-source"
-          className="absolute left-[-9999px] top-[-9999px] w-[600px] h-[350px] bg-black border-2 border-brand-gold flex flex-col justify-between p-6 text-white font-sans relative overflow-hidden"
+          className="absolute left-[-9999px] top-[-9999px] w-[600px] h-[350px] bg-black border-2 border-brand-green flex flex-col justify-between p-6 text-white font-sans relative overflow-hidden"
           style={{
-            backgroundImage: 'radial-gradient(circle at center, #101011 0%, #000000 100%)',
+            backgroundImage: 'radial-gradient(circle at center, #050d08 0%, #000000 100%)',
           }}
         >
           {/* Ambient Card Glow elements */}
-          <div className="absolute top-0 right-0 w-44 h-44 bg-brand-gold/15 blur-3xl rounded-full" />
-          <div className="absolute bottom-0 left-0 w-44 h-44 bg-brand-red/10 blur-3xl rounded-full" />
+          <div className="absolute top-0 right-0 w-44 h-44 bg-brand-green/15 blur-3xl rounded-full" />
+          <div className="absolute bottom-0 left-0 w-44 h-44 bg-brand-gold/10 blur-3xl rounded-full" />
 
           {/* Card Header */}
           <div className="flex justify-between items-center border-b border-white/10 pb-4 relative z-10">
             <div className="flex items-center gap-3">
-              <span className="text-4xl">🐂</span>
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-brand-green relative">
+                <img
+                  src="/black-bull-logo.jpg"
+                  className="w-full h-full object-cover"
+                  alt="logo"
+                />
+              </div>
               <div>
                 <h2 className="text-lg font-black text-white leading-none tracking-tight">THE BLACK BULL AI</h2>
-                <span className="text-[9px] text-brand-gold font-bold tracking-widest uppercase">SOLANA ORACLE</span>
+                <span className="text-[9px] text-brand-green font-bold tracking-widest uppercase">SOLANA ORACLE</span>
               </div>
             </div>
             <div className="text-right">
@@ -320,7 +323,7 @@ export default function Home() {
             <div className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest">
               Trench Classification
             </div>
-            <div className="text-2xl font-black text-white uppercase tracking-wider glow-text-gold leading-none">
+            <div className="text-2xl font-black text-white uppercase tracking-wider glow-text-green leading-none">
               {balanceData.tier}
             </div>
 
@@ -328,7 +331,7 @@ export default function Home() {
               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">
                 Simulated Airdrop Allocation
               </span>
-              <span className="text-3xl font-black text-brand-gold font-mono block my-0.5">
+              <span className="text-3xl font-black text-brand-green font-mono block my-0.5">
                 {balanceData.allocationAmount.toLocaleString()}
               </span>
               <span className="text-[9px] text-gray-400 block font-bold uppercase tracking-widest">
@@ -346,7 +349,7 @@ export default function Home() {
               </span>
             </div>
             <div className="text-right flex flex-col gap-0.5">
-              <span className="text-brand-gold">Built by @kellycryptos</span>
+              <span className="text-brand-green">Built by @kellycryptos</span>
               <span className="text-[8px] text-gray-600 font-mono">the-black-bull-ai.vercel.app</span>
             </div>
           </div>
@@ -355,12 +358,18 @@ export default function Home() {
 
       {/* 1. Header Hero & Price Banner */}
       <header className="w-full mb-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-5 rounded-2xl gold-glow-border">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl sm:text-5xl animate-bounce">🐂</span>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-5 rounded-2xl green-glow-border">
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-brand-green green-glow-border">
+              <img
+                src="/black-bull-logo.jpg"
+                alt="Black Bull Logo"
+                className="object-cover w-full h-full"
+              />
+            </div>
             <div className="text-center md:text-left">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white glow-text-gold">
-                The Black Bull <span className="text-brand-gold">AI Oracle</span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white glow-text-green">
+                The Black Bull <span className="text-brand-green">AI Oracle</span>
               </h1>
               <p className="text-xs sm:text-sm text-gray-400 font-semibold tracking-widest uppercase">
                 "Charge Forward in the Trenches"
@@ -375,7 +384,7 @@ export default function Home() {
                 $ANSEM Price
               </span>
               {priceLoading && !priceData ? (
-                <span className="text-sm font-mono text-brand-gold animate-pulse">Loading...</span>
+                <span className="text-sm font-mono text-brand-green animate-pulse">Loading...</span>
               ) : priceError ? (
                 <span className="text-sm font-mono text-brand-red flex items-center gap-1">
                   <AlertTriangle className="w-3.5 h-3.5" /> Congested
@@ -406,10 +415,10 @@ export default function Home() {
             <button
               onClick={fetchPrice}
               disabled={priceLoading}
-              className="p-2 rounded-lg bg-white/5 hover:bg-brand-gold/10 hover:text-brand-gold transition-all duration-300 disabled:opacity-40"
+              className="p-2 rounded-lg bg-white/5 hover:bg-brand-green/10 hover:text-brand-green transition-all duration-300 disabled:opacity-40"
               title="Refresh Price"
             >
-              <RefreshCw className={`w-4 h-4 ${priceLoading ? 'animate-spin text-brand-gold' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${priceLoading ? 'animate-spin text-brand-green' : ''}`} />
             </button>
           </div>
         </div>
@@ -420,13 +429,28 @@ export default function Home() {
         
         {/* LEFT COLUMN: Allocation Checker */}
         <section className="lg:col-span-5 flex flex-col gap-6">
-          <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 gold-glow-border relative overflow-hidden flex-1 justify-center">
+          <div className="glass-panel rounded-3xl p-6 flex flex-col gap-5 green-glow-border relative overflow-hidden flex-1 justify-start">
             {/* Ambient Background Glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 blur-3xl rounded-full -z-10" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-red/5 blur-3xl rounded-full -z-10" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 blur-3xl rounded-full -z-10" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-gold/5 blur-3xl rounded-full -z-10" />
+
+            {/* Banner logo inside card */}
+            <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-brand-green/30 green-glow-border mb-1">
+              <img
+                src="/black-bull-logo.jpg"
+                alt="Black Bull Official Banner"
+                className="object-cover w-full h-full object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-card via-black/40 to-transparent" />
+              <div className="absolute bottom-3 left-4">
+                <span className="text-[10px] bg-brand-green/20 border border-brand-green/40 text-brand-green px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  Oracle Active
+                </span>
+              </div>
+            </div>
 
             <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-              <Coins className="w-5 h-5 text-brand-gold" />
+              <Coins className="w-5 h-5 text-brand-green" />
               <h2 className="text-lg font-bold text-white tracking-wide uppercase">
                 Airdrop Simulator
               </h2>
@@ -448,14 +472,14 @@ export default function Home() {
                     value={xInput}
                     onChange={(e) => setXInput(e.target.value)}
                     disabled={checkerLoading}
-                    className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold focus:outline-none rounded-xl pl-8 pr-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
+                    className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl pl-8 pr-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Wallet className="w-3.5 h-3.5 text-brand-gold" /> Solana Wallet Address
+                  <Wallet className="w-3.5 h-3.5 text-brand-green" /> Solana Wallet Address
                 </label>
                 <input
                   type="text"
@@ -463,14 +487,14 @@ export default function Home() {
                   value={walletInput}
                   onChange={(e) => setWalletInput(e.target.value)}
                   disabled={checkerLoading}
-                  className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold focus:outline-none rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
+                  className="w-full bg-black/50 border border-white/10 hover:border-white/20 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-gray-600 transition-all duration-300"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={checkerLoading}
-                className="w-full bg-brand-gold hover:bg-brand-gold-dark text-black font-extrabold uppercase py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-gold/10 hover:shadow-brand-gold/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm tracking-wider"
+                className="w-full bg-brand-green hover:bg-brand-green-dark text-black font-extrabold uppercase py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-green/10 hover:shadow-brand-green/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm tracking-wider"
               >
                 {checkerLoading ? (
                   <>
@@ -503,7 +527,7 @@ export default function Home() {
 
             {/* Allocation Results Panel */}
             {balanceData && (
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 animate-fadeIn">
+              <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 animate-fadeIn">
                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
@@ -513,19 +537,19 @@ export default function Home() {
                       {balanceData.formattedBalance} $ANSEM
                     </span>
                   </div>
-                  <div className="bg-brand-gold/10 border border-brand-gold/30 text-brand-gold font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
+                  <div className="bg-brand-green/10 border border-brand-green/30 text-brand-green font-extrabold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
                     {balanceData.tier}
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center py-2 bg-black/30 rounded-xl border border-white/5 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 bg-brand-gold text-black font-extrabold text-[8px] uppercase px-1.5 py-0.5 rounded-br-lg tracking-wider">
+                  <div className="absolute top-0 left-0 bg-brand-green text-black font-extrabold text-[8px] uppercase px-1.5 py-0.5 rounded-br-lg tracking-wider">
                     Simulated Allocation
                   </div>
                   <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2">
                     Airdrop Share
                   </span>
-                  <span className="text-3xl font-black text-brand-gold font-mono tracking-tight glow-text-gold">
+                  <span className="text-3xl font-black text-brand-green font-mono tracking-tight glow-text-green">
                     {balanceData.allocationAmount.toLocaleString()}
                   </span>
                   <span className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
@@ -533,7 +557,7 @@ export default function Home() {
                   </span>
                 </div>
 
-                <p className="text-xs text-gray-300 leading-relaxed bg-brand-gold/5 border-l-2 border-brand-gold p-3 rounded-r-lg font-medium italic">
+                <p className="text-xs text-gray-300 leading-relaxed bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg font-medium italic">
                   "{balanceData.message}"
                 </p>
 
@@ -544,7 +568,7 @@ export default function Home() {
                     disabled={generatingCard}
                     className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all duration-300 cursor-pointer disabled:opacity-50"
                   >
-                    <Download className="w-4 h-4 text-brand-gold" />
+                    <Download className="w-4 h-4 text-brand-green" />
                     {generatingCard ? 'Capturing...' : 'Download Card'}
                   </button>
                   <button
@@ -570,11 +594,11 @@ export default function Home() {
         </section>
 
         {/* RIGHT COLUMN: The Chat Terminal */}
-        <section className="lg:col-span-7 flex flex-col glass-panel rounded-3xl red-glow-border overflow-hidden min-h-[480px]">
+        <section className="lg:col-span-7 flex flex-col glass-panel rounded-3xl green-glow-border overflow-hidden min-h-[480px]">
           {/* Chat Header */}
           <div className="bg-brand-slate px-5 py-4 border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-red animate-pulse-slow" />
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-green animate-pulse-slow" />
               <span className="text-xs font-black uppercase text-gray-400 tracking-wider">
                 Trench Communicator v1.0
               </span>
@@ -587,7 +611,7 @@ export default function Home() {
           </div>
 
           {/* Chat Messages Log */}
-          <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 custom-scrollbar max-h-[380px]">
+          <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 custom-scrollbar max-h-[440px]">
             {chatMessages.map((msg, idx) => (
               <div
                 key={idx}
@@ -601,7 +625,7 @@ export default function Home() {
                 <div
                   className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                     msg.role === 'user'
-                      ? 'bg-brand-gold text-black font-semibold rounded-tr-none'
+                      ? 'bg-brand-green text-black font-bold rounded-tr-none'
                       : 'bg-white/[0.03] border border-white/5 text-gray-200 rounded-tl-none font-medium'
                   }`}
                 >
@@ -630,25 +654,25 @@ export default function Home() {
           <div className="px-5 py-2.5 border-t border-white/5 flex flex-wrap gap-2 bg-brand-slate/40">
             <button
               onClick={() => triggerQuickAction('price')}
-              className="text-xs bg-white/5 border border-white/5 hover:border-brand-gold/40 hover:text-brand-gold text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
+              className="text-xs bg-white/5 border border-white/5 hover:border-brand-green/40 hover:text-brand-green text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
             >
-              <TrendingUp className="w-3.5 h-3.5 text-brand-gold" /> Price Prediction
+              <TrendingUp className="w-3.5 h-3.5 text-brand-green" /> Price Prediction
             </button>
             <button
               onClick={() => triggerQuickAction('lore')}
-              className="text-xs bg-white/5 border border-white/5 hover:border-brand-gold/40 hover:text-brand-gold text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
+              className="text-xs bg-white/5 border border-white/5 hover:border-brand-green/40 hover:text-brand-green text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5 text-blue-400" /> Teach Me Lore
             </button>
             <button
               onClick={() => triggerQuickAction('roast')}
-              className="text-xs bg-white/5 border border-white/5 hover:border-brand-red/40 hover:text-brand-red text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
+              className="text-xs bg-white/5 border border-white/5 hover:border-brand-green/40 hover:text-brand-green text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
             >
-              <Skull className="w-3.5 h-3.5 text-brand-red" /> Roast Me
+              <Skull className="w-3.5 h-3.5 text-brand-red animate-pulse" /> Roast Me
             </button>
             <button
               onClick={() => triggerQuickAction('motivate')}
-              className="text-xs bg-white/5 border border-white/5 hover:border-brand-gold/40 hover:text-brand-gold text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
+              className="text-xs bg-white/5 border border-white/5 hover:border-brand-green/40 hover:text-brand-green text-gray-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-300 cursor-pointer"
             >
               <Flame className="w-3.5 h-3.5 text-orange-500 animate-pulse" /> Bull Motivation
             </button>
@@ -669,12 +693,12 @@ export default function Home() {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 disabled={chatLoading}
-                className="flex-1 bg-black border border-white/10 focus:border-brand-red focus:ring-1 focus:ring-brand-red focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 transition-all duration-300"
+                className="flex-1 bg-black border border-white/10 focus:border-brand-green focus:ring-1 focus:ring-brand-green focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 transition-all duration-300"
               />
               <button
                 type="submit"
                 disabled={!chatInput.trim() || chatLoading}
-                className="bg-brand-red hover:bg-red-600 text-white p-3 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-brand-red/10"
+                className="bg-brand-green hover:bg-brand-green-dark text-black p-3 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-brand-green/10 animate-pulse-slow"
               >
                 <Send className="w-4 h-4 fill-current" />
               </button>
@@ -693,7 +717,7 @@ export default function Home() {
             href="https://x.com/kellycryptos"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-gold hover:text-brand-gold-dark hover:underline flex items-center gap-1 transition-all duration-300"
+            className="text-brand-green hover:text-brand-green-dark hover:underline flex items-center gap-1 transition-all duration-300"
           >
             <Twitter className="w-3.5 h-3.5 fill-current" /> Built by @kellycryptos
           </a>
