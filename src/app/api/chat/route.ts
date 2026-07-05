@@ -68,20 +68,20 @@ ${walletContext}
     let reply = '';
     // 4. Try Qwen model first, fall back to Llama if rate-limited or unavailable
     try {
-      console.log('[API] Attempting completion using model qwen-2.5-32b...');
+      console.log('[API] Attempting completion using model llama-3.3-70b-versatile...');
       const chatCompletion = await groq.chat.completions.create({
         messages: formattedMessages,
-        model: 'qwen-2.5-32b',
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.8,
         max_tokens: 400,
       });
       reply = chatCompletion.choices[0]?.message?.content || '';
-    } catch (qwenError: any) {
-      console.warn('[API] Qwen model failed, falling back to Llama...', qwenError.message || qwenError);
+    } catch (llamaError: any) {
+      console.warn('[API] Llama 3.3 model failed, falling back to Llama 3.1-8b...', llamaError.message || llamaError);
       
       const chatCompletion = await groq.chat.completions.create({
         messages: formattedMessages,
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.8,
         max_tokens: 400,
       });
