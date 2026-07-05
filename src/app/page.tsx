@@ -235,6 +235,15 @@ export default function Home() {
         await preloadImage(cardAvatarUrl);
       }
 
+      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
+      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
@@ -290,6 +299,15 @@ export default function Home() {
       // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
+      }
+
+      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
+      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       const canvas = await html2canvas(cardElement, {
@@ -391,6 +409,15 @@ export default function Home() {
         await preloadImage(cardAvatarUrl);
       }
 
+      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
+      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       const canvas = await html2canvas(cardElement, {
         scale: 2, // High DPI capture
         backgroundColor: '#000000',
@@ -444,6 +471,15 @@ export default function Home() {
       // Preload image with CORS
       if (cardAvatarUrl && cardAvatarUrl.startsWith('http')) {
         await preloadImage(cardAvatarUrl);
+      }
+
+      // Pre-flight avatar check — swap to local logo if image didn't actually load
+      const avatarImgEl = cardElement.querySelector('img[alt="logo"]') as HTMLImageElement | null;
+      console.log('[Card Debug] cardAvatarUrl:', cardAvatarUrl, '| complete:', avatarImgEl?.complete, '| naturalWidth:', avatarImgEl?.naturalWidth);
+      if (avatarImgEl && !(avatarImgEl.complete && avatarImgEl.naturalWidth > 0)) {
+        console.log('[Card Debug] Avatar not loaded — switching to local logo before capture');
+        setCardAvatarUrl('/black-bull-logo.jpg');
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       const canvas = await html2canvas(cardElement, {
@@ -616,7 +652,7 @@ export default function Home() {
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
             alt="bull bg"
           />
-          <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)] z-10" />
+          <div className="absolute inset-0 bg-[rgba(0,0,0,0.45)] z-10" />
 
           <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
             <div className="flex items-center gap-3">
@@ -688,7 +724,7 @@ export default function Home() {
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
           alt="bull bg"
         />
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)] z-10" />
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.45)] z-10" />
 
         <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.1)] pb-4 relative z-20">
           <div className="flex items-center gap-3">
