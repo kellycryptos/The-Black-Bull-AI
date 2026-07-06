@@ -4,6 +4,9 @@ import { validateSolanaAddress, getSolanaTokenBalance } from '@/utils/solana';
 const MINT_ADDRESS = '9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump';
 
 export async function GET(request: NextRequest) {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({ success: true, message: 'Build phase skip' });
+  }
   const { searchParams } = new URL(request.url);
   const wallet = searchParams.get('wallet');
   const xHandle = searchParams.get('x');

@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 const MINT_ADDRESS = '9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump';
 
 export async function GET() {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({ success: true, priceUsd: 0.30, priceChange24h: 0, source: 'build-mock' });
+  }
   const birdeyeApiKey = process.env.BIRDEYE_API_KEY;
 
   // Try Birdeye first if API key is provided

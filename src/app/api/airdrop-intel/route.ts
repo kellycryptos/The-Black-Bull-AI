@@ -22,6 +22,9 @@ let memoryCache: CacheData | null = null;
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes cache duration
 
 export async function GET(request: NextRequest) {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({ success: true, message: 'Build phase skip' });
+  }
   // Check if cache is still fresh
   if (memoryCache && Date.now() - memoryCache.timestamp < CACHE_TTL) {
     console.log('[Intel API] Serving from fresh in-memory cache');
