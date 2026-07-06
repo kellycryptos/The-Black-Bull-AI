@@ -68,9 +68,41 @@ const preloadImage = (src: string) =>
     img.src = src;
   });
 
+interface IntelRecipient {
+  wallet: string;
+  received: number;
+  heldBefore: number;
+  status: 'holding' | 'sold_some' | 'sold_all';
+  stillHolds: number;
+  estSoldFor: number;
+}
+
+const MOCK_INTEL_RECIPIENTS: IntelRecipient[] = [
+  { wallet: '8xG2P9vD2mKswT19K3h4j8y6LqWzR9p23xMv', received: 1250000, heldBefore: 0, status: 'holding', stillHolds: 1250000, estSoldFor: 0 },
+  { wallet: 'D9sP3xMf5kGvQ7t9L3h4j8y6LqWzR9p23xMv', received: 750000, heldBefore: 50000, status: 'sold_some', stillHolds: 300000, estSoldFor: 112500 },
+  { wallet: 'FpQ1tQw2sLf5kGvQ7t9L3h4j8y6LqWzR9p23xMv', received: 500000, heldBefore: 120000, status: 'sold_all', stillHolds: 0, estSoldFor: 125000 },
+  { wallet: 'J7sT9pLm8xG2P9vD2mKswT19K3h4j8y6LqWz', received: 350000, heldBefore: 0, status: 'holding', stillHolds: 350000, estSoldFor: 0 },
+  { wallet: 'K3pW5vNx7sT9pLm8xG2P9vD2mKswT19K3h4', received: 200000, heldBefore: 10000, status: 'sold_some', stillHolds: 50000, estSoldFor: 37500 },
+  { wallet: 'A2rT8mKp5vNx7sT9pLm8xG2P9vD2mKswT19K', received: 150000, heldBefore: 5000, status: 'holding', stillHolds: 150000, estSoldFor: 0 },
+  { wallet: 'H6yG3xWzD9sP3xMf5kGvQ7t9L3h4j8y6LqWz', received: 100000, heldBefore: 0, status: 'sold_all', stillHolds: 0, estSoldFor: 25000 },
+  { wallet: 'B5tP7nLkK3pW5vNx7sT9pLm8xG2P9vD2mKsw', received: 75000, heldBefore: 2000, status: 'sold_some', stillHolds: 25000, estSoldFor: 12500 },
+  { wallet: 'C9yQ2pQwA2rT8mKp5vNx7sT9pLm8xG2P9vD2m', received: 50000, heldBefore: 500, status: 'holding', stillHolds: 50000, estSoldFor: 0 },
+  { wallet: 'E1wD6tRxH6yG3xWzD9sP3xMf5kGvQ7t9L3h4', received: 25000, heldBefore: 0, status: 'sold_all', stillHolds: 0, estSoldFor: 6250 }
+];
+
+const MOCK_HOLDERS_OVER_TIME = [
+  { day: 'Day 1', holders: 10500 },
+  { day: 'Day 2', holders: 11200 },
+  { day: 'Day 3', holders: 11800 },
+  { day: 'Day 4', holders: 12100 },
+  { day: 'Day 5', holders: 12450 },
+  { day: 'Day 6', holders: 12650 },
+  { day: 'Day 7', holders: 12854 }
+];
+
 export default function Home() {
   // Tab Switcher state
-  const [activeTab, setActiveTab] = useState<'scanner' | 'simulator'>('scanner');
+  const [activeTab, setActiveTab] = useState<'scanner' | 'simulator' | 'intel'>('scanner');
 
   // Input fields (Scanner)
   const [walletInput, setWalletInput] = useState('');
@@ -96,6 +128,11 @@ export default function Home() {
   const [simSupplyPct, setSimSupplyPct] = useState(10);
   const [simCapIndex, setSimCapIndex] = useState(3); // Defaults to index 3 ($100M cap)
 
+  // Airdrop Intel States
+  const [intelFilter, setIntelFilter] = useState<'all' | 'holding' | 'sold_some' | 'sold_all'>('all');
+  const [intelSortField, setIntelSortField] = useState<'wallet' | 'received' | 'heldBefore' | 'stillHolds' | 'estSoldFor'>('received');
+  const [intelSortDirection, setIntelSortDirection] = useState<'asc' | 'desc'>('desc');
+
   // Card Generation States
   const [generatingCard, setGeneratingCard] = useState(false);
   const [copyingCard, setCopyingCard] = useState(false);
@@ -113,6 +150,44 @@ export default function Home() {
 
   // Auto-scroll ref
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Airdrop Intel Helpers
+  const handleSort = (field: 'wallet' | 'received' | 'heldBefore' | 'stillHolds' | 'estSoldFor') => {
+    if (intelSortField === field) {
+      setIntelSortDirection(intelSortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setIntelSortField(field);
+      setIntelSortDirection('desc');
+    }
+  };
+
+  const renderSortIndicator = (field: 'wallet' | 'received' | 'heldBefore' | 'stillHolds' | 'estSoldFor') => {
+    if (intelSortField !== field) return null;
+    return intelSortDirection === 'asc' ? ' ▲' : ' ▼';
+  };
+
+  const getSortedRecipients = () => {
+    let filtered = [...MOCK_INTEL_RECIPIENTS];
+    if (intelFilter !== 'all') {
+      filtered = filtered.filter(r => r.status === intelFilter);
+    }
+    filtered.sort((a, b) => {
+      const aVal = a[intelSortField];
+      const bVal = b[intelSortField];
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        const comp = aVal.toLowerCase().localeCompare(bVal.toLowerCase());
+        return intelSortDirection === 'asc' ? comp : -comp;
+      }
+      
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return intelSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+      
+      return 0;
+    });
+    return filtered;
+  };
 
   // 1. Fetch live token price on mount
   useEffect(() => {
@@ -814,11 +889,11 @@ export default function Home() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex bg-black/40 border border-white/5 p-1 rounded-xl">
+            <div className="flex bg-black/40 border border-white/5 p-1 rounded-xl gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('scanner')}
-                className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                className={`flex-1 text-center py-2 px-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                   activeTab === 'scanner'
                     ? 'bg-brand-green text-black font-extrabold shadow-md shadow-brand-green/10'
                     : 'text-gray-400 hover:text-white'
@@ -829,13 +904,24 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setActiveTab('simulator')}
-                className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                className={`flex-1 text-center py-2 px-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                   activeTab === 'simulator'
                     ? 'bg-brand-green text-black font-extrabold shadow-md shadow-brand-green/10'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Bull Simulator
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('intel')}
+                className={`flex-1 text-center py-2 px-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                  activeTab === 'intel'
+                    ? 'bg-brand-green text-black font-extrabold shadow-md shadow-brand-green/10'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Airdrop Intel
               </button>
             </div>
 
@@ -1149,6 +1235,227 @@ export default function Home() {
                     <Twitter className="w-4 h-4 fill-current" />
                     Post Simulation to X
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: Airdrop Intel View */}
+            {activeTab === 'intel' && (
+              <div className="flex flex-col gap-4 animate-fadeIn">
+                <div className="bg-brand-green/5 border-l-2 border-brand-green p-3 rounded-r-lg">
+                  <p className="text-xs text-gray-300 leading-relaxed font-semibold">
+                    Real-time stats and recipient behavior tracker. See who is holding, selling, or loading up!
+                  </p>
+                </div>
+
+                {/* Aggregate Stats Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/[0.02] border border-white/5 p-3 rounded-xl flex flex-col justify-between">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Total Recipients</span>
+                    <span className="text-lg font-black text-white font-mono mt-1">12,854</span>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 p-3 rounded-xl flex flex-col justify-between">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Total Airdropped</span>
+                    <span className="text-lg font-black text-[#10b981] font-mono mt-1">150M <span className="text-[10px] text-gray-500 font-sans font-normal">$ANSEM</span></span>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 p-3 rounded-xl flex flex-col justify-between">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Airdrop Value (At Launch vs Now)</span>
+                    <div className="flex flex-col mt-1">
+                      <span className="text-xs text-gray-500 font-mono font-bold">$1.5M <span className="text-[8px] font-sans font-normal">(@ $0.01)</span></span>
+                      <span className="text-sm font-black text-[#fbbf24] font-mono">$45.0M <span className="text-[8px] font-sans font-normal">(@ $0.30)</span></span>
+                    </div>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 p-3 rounded-xl flex flex-col justify-between">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Hold vs Sold Split</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex-1 h-2 bg-brand-red rounded-full overflow-hidden flex">
+                        <div className="h-full bg-[#10b981]" style={{ width: '34%' }} />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-white whitespace-nowrap">34% / 66%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Holders Over Time Chart */}
+                <div className="bg-white/[0.02] border border-white/5 p-3 rounded-xl">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Holders Growth (Launch ➔ Day 7)</span>
+                    <span className="text-[10px] text-[#10b981] font-mono font-bold flex items-center gap-0.5">
+                      <TrendingUp className="w-3 h-3" /> +22.4%
+                    </span>
+                  </div>
+                  <div className="w-full h-[100px] relative">
+                    <svg className="w-full h-full" viewBox="0 0 500 100" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      {/* Grid Lines */}
+                      <line x1="0" y1="25" x2="500" y2="25" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                      <line x1="0" y1="50" x2="500" y2="50" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                      <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                      
+                      {/* Filled Area */}
+                      <path
+                        d="M 0,85 C 41.5,73.5 83,62 83,62 C 124.5,52.5 166,43 166,43 C 208,38 250,33 250,33 C 291.5,27.5 333,22 333,22 C 374.5,18.5 416,15 416,15 C 458,12.5 500,10 500,10 L 500,100 L 0,100 Z"
+                        fill="url(#chartGradient)"
+                      />
+                      {/* Line Path */}
+                      <path
+                        d="M 0,85 C 41.5,73.5 83,62 83,62 C 124.5,52.5 166,43 166,43 C 208,38 250,33 250,33 C 291.5,27.5 333,22 333,22 C 374.5,18.5 416,15 416,15 C 458,12.5 500,10 500,10"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        style={{ filter: 'drop-shadow(0px 0px 4px rgba(16, 185, 129, 0.4))' }}
+                      />
+                      {/* Data dots */}
+                      <circle cx="0" cy="85" r="3" fill="#10b981" />
+                      <circle cx="83" cy="62" r="3" fill="#10b981" />
+                      <circle cx="166" cy="43" r="3" fill="#10b981" />
+                      <circle cx="250" cy="33" r="3" fill="#10b981" />
+                      <circle cx="333" cy="22" r="3" fill="#10b981" />
+                      <circle cx="416" cy="15" r="3" fill="#10b981" />
+                      <circle cx="500" cy="10" r="3" fill="#10b981" />
+                    </svg>
+                  </div>
+                  <div className="flex justify-between text-[8px] text-gray-500 font-mono font-bold mt-1.5 px-0.5">
+                    <span>10.5K Holders</span>
+                    <span>11.8K</span>
+                    <span>12.4K</span>
+                    <span>12.8K Holders</span>
+                  </div>
+                </div>
+
+                {/* Filter Tabs for table */}
+                <div className="flex bg-black/30 border border-white/5 p-0.5 rounded-lg text-[10px] font-bold">
+                  {(['all', 'holding', 'sold_some', 'sold_all'] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      type="button"
+                      onClick={() => setIntelFilter(filter)}
+                      className={`flex-1 text-center py-1.5 rounded uppercase tracking-wider transition-all duration-300 ${
+                        intelFilter === filter
+                          ? 'bg-[#10b981]/15 text-[#10b981] font-extrabold'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {filter.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Recipients Table */}
+                <div className="bg-white/[0.01] border border-white/5 rounded-xl overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[10px] text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-white/5 bg-black/30 text-gray-400 uppercase font-bold tracking-wider">
+                          <th className="py-2.5 px-3 cursor-pointer select-none hover:text-white transition-colors" onClick={() => handleSort('wallet')}>
+                            Recipient {renderSortIndicator('wallet')}
+                          </th>
+                          <th className="py-2.5 px-3 text-right cursor-pointer select-none hover:text-white transition-colors" onClick={() => handleSort('received')}>
+                            Received {renderSortIndicator('received')}
+                          </th>
+                          <th className="py-2.5 px-3 text-right cursor-pointer select-none hover:text-white transition-colors" onClick={() => handleSort('heldBefore')}>
+                            Held Before {renderSortIndicator('heldBefore')}
+                          </th>
+                          <th className="py-2.5 px-3 text-center">Status</th>
+                          <th className="py-2.5 px-3 text-right cursor-pointer select-none hover:text-white transition-colors" onClick={() => handleSort('stillHolds')}>
+                            Still Holds {renderSortIndicator('stillHolds')}
+                          </th>
+                          <th className="py-2.5 px-3 text-right cursor-pointer select-none hover:text-white transition-colors" onClick={() => handleSort('estSoldFor')}>
+                            Est. Sold For {renderSortIndicator('estSoldFor')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5 font-mono">
+                        {getSortedRecipients().map((r) => {
+                          const statusColors = {
+                            holding: 'bg-[rgba(16,185,129,0.1)] border-[#10b981] text-[#10b981]',
+                            sold_some: 'bg-[rgba(251,191,36,0.1)] border-[#fbbf24] text-[#fbbf24]',
+                            sold_all: 'bg-[rgba(239,68,68,0.1)] border-brand-red text-brand-red'
+                          };
+                          
+                          return (
+                            <tr key={r.wallet} className="hover:bg-white/[0.01] transition-colors">
+                              <td className="py-2.5 px-3">
+                                <a
+                                  href={`https://x.com/search?q=${r.wallet}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:underline flex items-center gap-1 font-bold"
+                                  title="Search wallet address on X"
+                                >
+                                  {r.wallet.slice(0, 4)}...{r.wallet.slice(-4)}
+                                  <Twitter className="w-2.5 h-2.5 fill-current opacity-70" />
+                                </a>
+                              </td>
+                              <td className="py-2.5 px-3 text-right text-white">{r.received.toLocaleString()}</td>
+                              <td className="py-2.5 px-3 text-right text-gray-400">{r.heldBefore.toLocaleString()}</td>
+                              <td className="py-2.5 px-3 text-center">
+                                <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] uppercase font-bold border ${statusColors[r.status]}`}>
+                                  {r.status.replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-right text-white font-bold">{r.stillHolds.toLocaleString()}</td>
+                              <td className="py-2.5 px-3 text-right text-[#fbbf24] font-bold">
+                                {r.estSoldFor > 0 ? `$${r.estSoldFor.toLocaleString()}` : '-'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="py-2 px-3 bg-black/20 text-[9px] text-gray-500 font-bold text-center border-t border-white/5 uppercase tracking-wider">
+                    * Mock dashboard data. Connect real-time indexer for production.
+                  </div>
+                </div>
+
+                {/* Community Section */}
+                <div className="bg-white/[0.01] border border-white/5 rounded-xl p-3.5 mt-1 flex flex-col gap-2">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Community & Resources</span>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-bold">
+                    <a
+                      href="https://dexscreener.com/solana/9cRCvJ471T58p7C1Y7vLgW777cT2N1K2m3n4"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/5 hover:bg-brand-green/10 hover:text-brand-green border border-white/5 p-2 rounded-lg transition-all duration-300 flex items-center justify-between"
+                    >
+                      <span>Dexscreener Chart</span>
+                      <span className="text-gray-500">➔</span>
+                    </a>
+                    <a
+                      href="https://solscan.io/token/9cRCvJ471T58p7C1Y7vLgW777cT2N1K2m3n4"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/5 hover:bg-brand-green/10 hover:text-brand-green border border-white/5 p-2 rounded-lg transition-all duration-300 flex items-center justify-between"
+                    >
+                      <span>Solscan Ledger</span>
+                      <span className="text-gray-500">➔</span>
+                    </a>
+                    <a
+                      href="https://app.bullpen.fi/claim?ref=Kellycryptos"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/5 hover:bg-brand-gold/10 hover:text-brand-gold border border-white/5 p-2 rounded-lg transition-all duration-300 flex items-center justify-between"
+                    >
+                      <span>Bullpen Claims</span>
+                      <span className="text-gray-500">➔</span>
+                    </a>
+                    <a
+                      href="https://x.com/blknoiz06"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/5 hover:bg-brand-green/10 hover:text-brand-green border border-white/5 p-2 rounded-lg transition-all duration-300 flex items-center justify-between"
+                    >
+                      <span>Ansem X Profile</span>
+                      <span className="text-gray-500">➔</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             )}
