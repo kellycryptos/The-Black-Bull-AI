@@ -1,5 +1,10 @@
 'use client';
 
+// Skip static pre-render — prevents OOM during Next.js build's static generation phase.
+// This page is a fully client-rendered component; dynamic serving has no UX cost.
+export const dynamic = 'force-dynamic';
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import {
