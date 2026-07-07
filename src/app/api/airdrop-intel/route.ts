@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // Configures maximum duration limit for Vercel execution environment
+export const maxDuration = 60; // Max duration configuration for paid tiers (silently capped at 10s on Vercel Hobby)
 
 const SOURCE_WALLET = 'GV6UUmNxz2RpKxmNAPadYKb7uQpszwqQAu3qLJxVdC52'; // Ansem's wallet
 const MINT_ADDRESS = '9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump';
@@ -25,7 +25,7 @@ let memoryCache: CacheData | null = null;
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes cache duration
 
 // Fetch with hard internal timeout guard using AbortController
-async function fetchWithTimeout(url: string, apiKey: string, timeoutMs = 8000): Promise<Response> {
+async function fetchWithTimeout(url: string, apiKey: string, timeoutMs = 5500): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     controller.abort();
@@ -68,17 +68,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // 2. If a stale cache exists, we race our fetch attempt with a tight timeout (e.g. 5 seconds).
-  // If the fetch takes longer, we immediately serve the stale cache to prevent Vercel execution timeout.
-  // If no cache exists, we use a longer timeout (15s) to try to fetch the initial data.
+  // 2. We race our fetch attempt with a tight timeout limit.
+  // Vercel Hobby plan limit is 10s. We set a limit of 4s if stale cache exists, or 7.5s if no cache exists.
+  // This guarantees we return a clean response before Vercel terminates the serverless function.
   const hasStaleCache = !!memoryCache;
-  const fetchTimeoutLimit = hasStaleCache ? 5000 : 15000;
+  const fetchTimeoutLimit = hasStaleCache ? 4000 : 7500;
 
   try {
     const freshData = await Promise.race([
       fetchFreshData(birdeyeApiKey),
       new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error('Fetch timeout limit reached')), fetchTimeoutLimit)
+        setTimeout(() => reject(new Error('Birdeye API queries timed out')), fetchTimeoutLimit)
       )
     ]);
 
@@ -102,49 +102,65 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: err.message || 'Failed to retrieve on-chain distribution history from Birdeye API.',
+        error: `Birdeye indexer is temporarily slow. Please click "Retry Scan" to fetch dynamic data. (${err.message || 'Timeout'})`,
       },
-      { status: 502 }
+      { status: 504 }
     );
   }
 }
 
 async function fetchFreshData(birdeyeApiKey: string) {
-  let currentPrice = 0.30;
-
-  // 1. Fetch current price from Birdeye
-  try {
-    const priceRes = await fetchWithTimeout(
-      `https://public-api.birdeye.so/v1/xtoken/price?address=${MINT_ADDRESS}`,
-      birdeyeApiKey,
-      4000
-    );
-    if (priceRes.ok) {
-      const priceData = await priceRes.json();
-      if (priceData.success && priceData.data?.value) {
-        currentPrice = priceData.data.value;
-      }
-    }
-  } catch (e: any) {
-    console.warn('[Intel API] Price fetch timed out or failed, fallback to $0.30:', e.message || e);
-  }
-
-  // 2. Fetch current holder list + balances (Parallelized queries, capped at top 500)
-  const holdersMap = new Map<string, number>();
-  const pageCount = 5; // fetch top 500 holders (5 pages of 100)
+  // We limit pageCount to 3 (top 300 holders) to reduce concurrent request load and speed up fetch time.
+  const pageCount = 3;
   const offsets = Array.from({ length: pageCount }, (_, i) => i * 100);
 
-  console.log('[Intel API] Parallelizing holders query...');
+  // 1. Initialize all Promises in parallel
+  const pricePromise = fetchWithTimeout(
+    `https://public-api.birdeye.so/v1/xtoken/price?address=${MINT_ADDRESS}`,
+    birdeyeApiKey,
+    5500
+  );
+
+  const txPromise = fetchWithTimeout(
+    `https://public-api.birdeye.so/v1/wallet/tx_list?wallet=${SOURCE_WALLET}&limit=100&ui_amount_mode=scaled`,
+    birdeyeApiKey,
+    5500
+  );
+
   const holderPromises = offsets.map(offset =>
     fetchWithTimeout(
       `https://public-api.birdeye.so/defi/v3/token/holder?address=${MINT_ADDRESS}&offset=${offset}&limit=100&ui_amount_mode=scaled`,
       birdeyeApiKey,
-      6000
+      5500
     )
   );
 
-  const holderResults = await Promise.allSettled(holderPromises);
+  console.log('[Intel API] Initiating all Birdeye requests in parallel...');
 
+  // 2. Await all promises using Promise.allSettled
+  const [priceResult, txResult, ...holderResults] = await Promise.allSettled([
+    pricePromise,
+    txPromise,
+    ...holderPromises
+  ]);
+
+  // 3. Process Price
+  let currentPrice = 0.30;
+  if (priceResult.status === 'fulfilled' && priceResult.value.ok) {
+    try {
+      const priceData = await priceResult.value.json();
+      if (priceData.success && priceData.data?.value) {
+        currentPrice = priceData.data.value;
+      }
+    } catch (e) {
+      console.warn('[Intel API] Price parsing error:', e);
+    }
+  } else {
+    console.warn('[Intel API] Price query failed or timed out.');
+  }
+
+  // 4. Process Holders Map
+  const holdersMap = new Map<string, number>();
   for (let i = 0; i < holderResults.length; i++) {
     const result = holderResults[i];
     if (result.status === 'fulfilled' && result.value.ok) {
@@ -161,36 +177,31 @@ async function fetchFreshData(birdeyeApiKey: string) {
         console.warn(`[Intel API] Failed to parse holders page ${i + 1}:`, jsonErr);
       }
     } else {
-      console.warn(`[Intel API] Holder page ${i + 1} request rejected or failed.`);
+      console.warn(`[Intel API] Holder page ${i + 1} request timed out or failed.`);
     }
   }
 
-  console.log(`[Intel API] Populated ${holdersMap.size} unique holders.`);
-
-  // 3. Fetch outbound airdrop transactions from Ansem's wallet
+  // 5. Process Transactions
   let txItems: any[] = [];
-  try {
-    const txListRes = await fetchWithTimeout(
-      `https://public-api.birdeye.so/v1/wallet/tx_list?wallet=${SOURCE_WALLET}&limit=100&ui_amount_mode=scaled`,
-      birdeyeApiKey,
-      6000
-    );
-    if (txListRes.ok) {
-      const txPayload = await txListRes.json();
+  if (txResult.status === 'fulfilled' && txResult.value.ok) {
+    try {
+      const txPayload = await txResult.value.json();
       if (txPayload.success && txPayload.data?.items) {
         txItems = txPayload.data.items;
       }
+    } catch (e) {
+      console.warn('[Intel API] Transaction list parsing error:', e);
     }
-  } catch (txErr: any) {
-    console.warn('[Intel API] Failed to fetch transaction list:', txErr.message || txErr);
+  } else {
+    console.warn('[Intel API] Transaction list query failed or timed out.');
   }
 
-  // Ensure we have some data before building metrics, otherwise trigger stale cache fallback
+  // Guard against complete failures
   if (holdersMap.size === 0 && txItems.length === 0) {
-    throw new Error('Empty payload returned from Birdeye API endpoints');
+    throw new Error('All Birdeye API queries timed out or failed');
   }
 
-  // 4. Map transactions to group received amounts per recipient
+  // 6. Group transfers
   const recipientMap = new Map<string, { wallet: string; received: number; firstTime: number }>();
 
   for (const tx of txItems) {
@@ -243,7 +254,6 @@ async function fetchFreshData(birdeyeApiKey: string) {
 
   const uniqueRecipients = Array.from(recipientMap.values());
 
-  // 5. Join datasets and calculate recipient metrics
   const recipientsData: IntelRecipient[] = uniqueRecipients.map((r) => {
     const currentBalance = holdersMap.get(r.wallet) || 0;
     const received = r.received;
@@ -271,7 +281,6 @@ async function fetchFreshData(birdeyeApiKey: string) {
     };
   });
 
-  // 6. Build holdersOverTime growth timeline from timestamps
   const holdersOverTime: { day: string; holders: number }[] = [];
   const validTimeRecipients = uniqueRecipients.filter(r => r.firstTime > 0);
 
@@ -318,7 +327,6 @@ async function fetchFreshData(birdeyeApiKey: string) {
     lastUpdated: new Date().toISOString()
   };
 
-  // Cache updated result
   memoryCache = {
     timestamp: Date.now(),
     data: finalResult
